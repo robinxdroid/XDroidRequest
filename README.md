@@ -78,9 +78,61 @@ XRequest.initXRequest(getApplicationContext());
 		 
 ```
 ② POST请求
+```java
+String url = "http://apis.baidu.com/heweather/weather/free";
+RequestParams params = new RequestParams();
+params.putHeaders("apikey", "可以到apistore申请");
+params.putParams("city", "hefei");
+
+XRequest.getInstance().sendPost(mRequestTag, url,  params, new OnRequestListenerAdapter<String>() {
+			
+	@Override
+	public void onRequestFailed(Request<?> request, HttpException httpException) {
+		super.onRequestFailed(request, httpException);
+		switch (httpException.getHttpErrorCode()) {
+		case HttpError.ERROR_NOT_NETWORK:
+			Toast.makeText(context, "网络未连接，请检查", Toast.LENGTH_SHORT).show();
+			break;
+		}
+	}
+
+	@Override
+	public void onRequestRetry(Request<?> request, int currentRetryCount, HttpException previousError) {
+		Toast.makeText(context, "获取信息失败，系统已经为您重试" + currentRetryCount+"次", Toast.LENGTH_SHORT).show();
+				
+		CLog.i("POST请求结果失败，正在重试,当前重试次数：" + currentRetryCount);
+	}
+			
+	@Override
+	public void onRequestDownloadProgress(Request<?> request, long transferredBytesSize, long totalSize) {
+		CLog.i("onRequestDownloadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
+	}
+			
+	@Override
+	public void onRequestUploadProgress(Request<?> request, long transferredBytesSize, long totalSize, int currentFileIndex,
+			File currentFile) {
+		CLog.i("onRequestUploadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
+	}
+
+	@Override
+	public void onDone(Request<?> request, Map<String, String> headers, String result, DataType dataType) {
+		super.onDone(request, headers, result, dataType);
+	}
+});
+```
 
 ③ 发送JSON字符串参数
-
+```java
+RequestParams params = new RequestParams();
+params.putParams(
+		"{\"uid\":863548,\"stickys\":[{\"id\":29058,\"iid\":0,\"content\":\"内容\",\"color\":\"green\",\"createtime\":\"2015-04-16 16:26:17\",\"updatetime\":\"2015-04-16 16:26:17\"}]}");
+XRequest.getInstance().sendPost(mRequestTag, url, params, new OnRequestListenerAdapter<String>() {
+	@Override
+	public void onDone(Request<?> request, Map<String, String> headers, String result, DataType dataType) {
+		super.onDone(request, headers, result, dataType);
+	}
+});
+```
 ④上传文件
 ```java
 String url = "http://192.168.1.150/upload_multi.php";
@@ -276,7 +328,7 @@ XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequest
  ```java
  String url = "http://apis.baidu.com/heweather/weather/free";
 		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
+		params.putHeaders("apikey", "可以到apistore申请");
 		params.putParams("city", "hefei");
 
 		String cacheKey = url + "post";  //与GET请求的URL一样，为了避免同样的缓存key、这里重新指定缓存key
