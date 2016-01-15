@@ -125,7 +125,7 @@ XRequest.getInstance().upload(mRequestTag, url,  params, new OnRequestListenerAd
 
 
 });
-```java
+```
 
 ⑤下载文件
 ```java
