@@ -1,4 +1,4 @@
-## XDroidRequest ##
+## XDroidRequest(README正在更新中) ##
 
 **XDroidRequest** 是一款网络请求框架,它的功能也许会适合你。这是本项目的第三版了，前两版由于扩展性问题一直不满意,思考来
 思考去还是觉得Google的Volley的扩展性最强,于是借鉴了Volley的责任链模式,所以有了这个第三版.
@@ -44,11 +44,12 @@
 
 ### Here is the sample ###
 
-[Download demo.apk](http://markdownpad.com)
+[Download demo.apk](https://github.com/robinxdroid/XDroidRequest/blob/master/XDroidRequestExample.apk?raw=true)
 
 ### Screenshot ###
 
-Fonts, color schemes, layouts and stylesheets are all 100% customizable so you can turn MarkdownPad into your perfect editor.
+![](https://raw.githubusercontent.com/robinxdroid/XDroidRequest/master/1.png) 
+![](https://raw.githubusercontent.com/robinxdroid/XDroidRequest/master/2.png) 
 
 ### Usage ###
 
@@ -85,7 +86,129 @@ XRequest.initXRequest(getApplicationContext());
 ⑤下载文件
 
 ⑥关于回调
+```java
+XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequestListener<String>() {
 
+			/**
+			 * 请求前准备回调
+			 * 运行线程：主线程
+			 * @param request 当前请求对象
+			 */
+			@Override
+			public void onRequestPrepare(Request<?> request) {
+				Toast.makeText(context, "GET请求准备", Toast.LENGTH_SHORT).show();
+				
+				CLog.i("GET请求准备");
+			}
+
+			/**
+			 * 请求完成回调
+			 * 运行线程：主线程
+			 * @param request 当前请求对象
+			 * @param headers 请求结果头文件Map集合
+			 * @param result 请求结果泛型对象
+			 */
+			@Override
+			public void onRequestFinish(Request<?> request, Map<String, String> headers, String result) {
+				Toast.makeText(context, "GET请求结果获取成功", Toast.LENGTH_SHORT).show();
+				CLog.i("GET请求结果获取成功");
+			}
+
+			/**
+			 * 请求失败回调
+			 * 运行线程：主线程
+			 * @param request 当前请求对象
+			 * @param httpException 错误类对象，包含错误码与错误描述
+			 */
+			@Override
+			public void onRequestFailed(Request<?> request, HttpException httpException) {
+				Toast.makeText(context, "GET请求结果失败", Toast.LENGTH_SHORT).show();
+				CLog.i("GET请求结果失败");
+			}
+
+			/**
+			 * 请求失败重试回调
+			 * 运行线程：主线程
+			 * @param request 当前请求对象
+			 * @param currentRetryCount 当前重试次数
+			 * @param previousError 上一个错误类对象，包含错误码与错误描述
+			 */
+			@Override
+			public void onRequestRetry(Request<?> request, int currentRetryCount, HttpException previousError) {
+				Toast.makeText(context, "获取信息失败，系统已经为您重试" + currentRetryCount+"次", Toast.LENGTH_SHORT).show();
+				
+				CLog.i("GET请求结果失败，正在重试,当前重试次数：" + currentRetryCount);
+			}
+			
+			/**
+			 * 下载进度回调
+			 * 运行线程：子线程
+			 * @param request 当前请求对象
+			 * @param transferredBytesSize 当前下载大小
+			 * @param totalSize 总大小
+			 * 
+			 */
+			@Override
+			public void onRequestDownloadProgress(Request<?> request, long transferredBytesSize, long totalSize) {
+				CLog.i("onRequestDownloadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
+			}
+			
+			/**
+			 * 上传进度回调
+			 * 运行线程：子线程
+			 * @param request 当前请求对象
+			 * @param transferredBytesSize 当前写入进度
+			 * @param totalSize 总进度
+			 * @param currentFileIndex 当前正在上传的是第几个文件
+			 * @param currentFile 当前正在上传的文件对象
+			 * 
+			 */
+			@Override
+			public void onRequestUploadProgress(Request<?> request, long transferredBytesSize, long totalSize, int currentFileIndex,
+					File currentFile) {
+				CLog.i("onRequestUploadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
+			}
+
+			/**
+			 * 缓存数据加载完成回调
+			 * 运行线程：主线程
+			 * @param request 当前请求对象
+			 * @param headers 缓存的头信息Map集合
+			 * @param result 缓存的数据结果对象
+			 */
+			@Override
+			public void onCacheDataLoadFinish(Request<?> request, Map<String, String> headers, String result) {
+				Toast.makeText(context, "GET请求缓存加载成功", Toast.LENGTH_SHORT).show();
+				CLog.i("GET请求缓存加载成功");
+			}
+			
+			/**
+			 * 解析网络数据回调，请求完成后，如果需要做耗时操作（比如写入数据库）可在此回调中进行，不会阻塞UI
+			 * 运行线程：子线程
+			 * @param request 当前请求对象
+			 * @param networkResponse 网络请求结果对象，包含byte数据流与头信息等
+			 * @param result 解析byte数据流构建的对象
+			 */
+			@Override
+			public void onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, String result) {
+				CLog.i("GET请求网络数据解析完成");
+			}
+
+			/**
+			 * 此请求最终完成回调，每次请求只会调用一次，无论此请求走的缓存数据还是网络数据，最后交付的结果走此回调
+			 * 运行线程：主线程
+			 * @param request 当前请求对象
+			 * @param headers 最终交付数据的头信息
+			 * @param result 最终交付的请求结果对象
+			 * @param dataType 最终交付的数据类型枚举，网络数据/缓存数据
+			 */
+			@Override
+			public void onDone(Request<?> request, Map<String, String> headers, String result, DataType dataType) {
+				Toast.makeText(context, "GET请求完成", Toast.LENGTH_SHORT).show();
+			}
+
+		});
+```
 ⑦自动解析
 
 ⑧缓存配置
