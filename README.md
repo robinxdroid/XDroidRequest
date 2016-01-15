@@ -82,8 +82,69 @@ XRequest.initXRequest(getApplicationContext());
 ③ 发送JSON字符串参数
 
 ④上传文件
+```java
+String url = "http://192.168.1.150/upload_multi.php";
+RequestParams params = new RequestParams();
+params.put("file[0]", new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "app-debug.apk"));
+params.put("file[1]", new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "photoview.apk"));
+params.putParams("file_name", "上传的文件名称");
+
+XRequest.getInstance().upload(mRequestTag, url,  params, new OnRequestListenerAdapter<String>() {
+
+	@Override
+	public void onRequestPrepare(Request<?> request) {
+		Toast.makeText(context, "请求准备", Toast.LENGTH_SHORT).show();
+		CLog.i("请求准备");
+	}
+
+	@Override
+	public void onRequestFailed(Request<?> request,HttpException httpException) {
+		Toast.makeText(context, "请求结果失败", Toast.LENGTH_SHORT).show();
+		CLog.i("请求结果失败");
+	}
+
+	@Override
+	public void onRequestRetry(Request<?> request, int currentRetryCount, HttpException previousError) {
+		Toast.makeText(context, "获取信息失败，系统已经为您重试" + currentRetryCount+"次", Toast.LENGTH_SHORT).show();
+		
+		CLog.i("请求结果失败，正在重试,当前重试次数：" + currentRetryCount);
+	}
+			
+	@Override
+	public void onRequestUploadProgress(Request<?> request, long transferredBytesSize, long totalSize, int currentFileIndex,
+			File currentFile) {
+		CLog.i("正在上传第%s个文件,当前进度：%d , 总大小 : %d" ,currentFileIndex,transferredBytesSize,totalSize);
+		
+		mUploadProgressBar.setMax((int) totalSize);
+		mUploadProgressBar.setProgress((int) transferredBytesSize);
+	}
+	@Override
+	public void onDone(Request<?> request, Map<String, String> headers, String response, DataType dataType) {
+		Toast.makeText(context, "请求完成", Toast.LENGTH_SHORT).show();
+	}
+
+
+});
+```java
 
 ⑤下载文件
+```java
+String url = "http://192.168.1.150/upload/xiaokaxiu.apk";
+String downloadPath = "/sdcard/xrequest/download";
+String fileName = "test.apk";
+XRequest.getInstance().download(mRequestTag, url, downloadPath,fileName, new OnRequestListenerAdapter<File>() {
+	@Override
+	public void onRequestDownloadProgress(Request<?> request, long transferredBytesSize, long totalSize) {
+		CLog.i("正在下载， 当前进度：%d , 总大小 : %d" ,transferredBytesSize,totalSize);
+		mDownloadProgressBar.setMax((int) totalSize);
+		mDownloadProgressBar.setProgress((int) transferredBytesSize);
+	}
+	@Override
+	public void onDone(Request<?> request, Map<String, String> headers, File result, DataType dataType) {
+		CLog.i("下载完成 : %s",result != null?result.toString():"获取File为空");
+	}
+});
+```
 
 ⑥关于回调
  请求回调OnRequestListener，回调函数很多，根据自己需求选择性复写即可，传入OnRequestListener默认实现类OnRequestListenerAdapter即可
