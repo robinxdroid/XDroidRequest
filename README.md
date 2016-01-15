@@ -48,8 +48,8 @@
 
 ### Screenshot ###
 
-![](https://raw.githubusercontent.com/robinxdroid/XDroidRequest/master/1.png) 
-![](https://raw.githubusercontent.com/robinxdroid/XDroidRequest/master/2.png) 
+![](https://raw.githubusercontent.com/robinxdroid/XDroidRequest/master/1.jpg) 
+![](https://raw.githubusercontent.com/robinxdroid/XDroidRequest/master/2.jpg) 
 
 ### Usage ###
 
