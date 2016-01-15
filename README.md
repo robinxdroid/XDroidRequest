@@ -86,6 +86,7 @@ XRequest.initXRequest(getApplicationContext());
 ⑤下载文件
 
 ⑥关于回调
+ 请求回调OnRequestListener，回调函数很多，根据自己需求选择性复写即可，传入OnRequestListener默认实现类OnRequestListenerAdapter即可
 ```java
 XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequestListener<String>() {
 
@@ -208,6 +209,53 @@ XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequest
 			}
 
 		});
+```
+
+ 下面是选择性复写回调函数
+ ```java
+ String url = "http://apis.baidu.com/heweather/weather/free";
+		RequestParams params = new RequestParams();
+		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
+		params.putParams("city", "hefei");
+
+		String cacheKey = url + "post";  //与GET请求的URL一样，为了避免同样的缓存key、这里重新指定缓存key
+		XRequest.getInstance().sendPost(mRequestTag, url, cacheKey, params, new OnRequestListenerAdapter<String>() {
+			
+			@Override
+			public void onRequestFailed(Request<?> request, HttpException httpException) {
+				super.onRequestFailed(request, httpException);
+				switch (httpException.getHttpErrorCode()) {
+				case HttpError.ERROR_NOT_NETWORK:
+					Toast.makeText(context, "网络未连接，请检查", Toast.LENGTH_SHORT).show();
+					break;
+				}
+			}
+
+			@Override
+			public void onRequestRetry(Request<?> request, int currentRetryCount, HttpException previousError) {
+				Toast.makeText(context, "获取信息失败，系统已经为您重试" + currentRetryCount+"次", Toast.LENGTH_SHORT).show();
+				
+				CLog.i("POST请求结果失败，正在重试,当前重试次数：" + currentRetryCount);
+			}
+			
+			@Override
+			public void onRequestDownloadProgress(Request<?> request, long transferredBytesSize, long totalSize) {
+				CLog.i("onRequestDownloadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
+			}
+			
+			@Override
+			public void onRequestUploadProgress(Request<?> request, long transferredBytesSize, long totalSize, int currentFileIndex,
+					File currentFile) {
+				CLog.i("onRequestUploadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
+			}
+
+			@Override
+			public void onDone(Request<?> request, Map<String, String> headers, String result, DataType dataType) {
+				super.onDone(request, headers, result, dataType);
+			}
+		});
+
+	}
 ```
 ⑦自动解析
 
