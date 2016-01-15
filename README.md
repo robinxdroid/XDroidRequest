@@ -44,11 +44,12 @@
 
 ### Here is the sample ###
 
-[Download demo.apk](http://markdownpad.com)
+[Download demo.apk](https://github.com/robinxdroid/XDroidRequest/blob/master/XDroidRequestExample.apk?raw=true)
 
 ### Screenshot ###
 
-Fonts, color schemes, layouts and stylesheets are all 100% customizable so you can turn MarkdownPad into your perfect editor.
+![](https://raw.githubusercontent.com/robinxdroid/XDroidRequest/master/1.png) 
+![](https://raw.githubusercontent.com/robinxdroid/XDroidRequest/master/2.png) 
 
 ### Usage ###
 
