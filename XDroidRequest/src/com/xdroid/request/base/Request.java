@@ -26,7 +26,6 @@ import com.xdroid.request.utils.CLog;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 
 /**
@@ -36,9 +35,6 @@ import android.util.Log;
  * @param <T> Return data type
  */
 public abstract class Request <T> implements IRequest<T>,IResponseDelivery<T> ,Comparable<Request<T>>{
-	/** Log tag */
-	private static final String Tag = "system.out";
-	
     private static final String DEFAULT_PARAMS_ENCODING = "UTF-8";
 	
 	/*
@@ -520,23 +516,23 @@ public abstract class Request <T> implements IRequest<T>,IResponseDelivery<T> ,C
 			CacheData<Entry<T>> cacheData=mMemorycacheManager.getDataFromMemoryCache(getCacheKey());
 			if (cacheData!=null) {
 				cacheData.setWriteTime(System.currentTimeMillis());
-				 Log.d(Tag,"cache-memory-update");
+				 CLog.d("cache-memory-update");
 			 }else {
 			    Entry<T> entry=new Entry<T>(result,headers );
 				cacheData=new CacheData<Entry<T>>(entry, mRequestCacheConfig.getTimeController().getExpirationTime(), System.currentTimeMillis(), getRequestCacheConfig().isNeverExpired());
 			    mMemorycacheManager.setDataToMemoryCache(cacheKey, cacheData);
-			    Log.d(Tag,"cache-memory-written");
+			    CLog.d("cache-memory-written");
 			 }
 			 //write disk cache
 			 CacheData<Entry<T>> diskCacheData= mDiskCacheManager.getDataFromDiskCache(getCacheKey());
 			 if (diskCacheData!=null) {
 			    mDiskCacheManager.deleteOneDiskCacheData(getCacheKey());
-				Log.d(Tag,"cache-disk-delete-old");
+				CLog.d("cache-disk-delete-old");
 			 }
 			 Entry<T> entry=new Entry<T>(result,headers );
 			 diskCacheData=new CacheData<Entry<T>>(entry, mRequestCacheConfig.getTimeController().getExpirationTime(), System.currentTimeMillis(), getRequestCacheConfig().isNeverExpired());
 			 mDiskCacheManager.setDataToDiskCache(getCacheKey(), diskCacheData);
-			 Log.d(Tag,"cache-disk-written");
+			 CLog.d("cache-disk-written");
 			   
 		}
 		
@@ -583,7 +579,7 @@ public abstract class Request <T> implements IRequest<T>,IResponseDelivery<T> ,C
 			}
 			
 			try {
-				Log.i(Tag, "|Reponse Delivered|"+
+				CLog.i( "|Reponse Delivered|"+
 			            "\n[DataType] : "+dataType+
 			            "\n[CacheKey] : "+getCacheKey()+ 
 			            "\n[Tag] : " + getTag() +

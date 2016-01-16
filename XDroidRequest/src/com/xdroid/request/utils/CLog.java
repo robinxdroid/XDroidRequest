@@ -55,6 +55,24 @@ public class CLog {
         sLevel = level;
     }
     
+    public static void openLog(){
+    	allowD = true;
+    	allowE = true;
+    	allowI = true;
+    	allowV = true;
+    	allowW = true;
+    	allowWtf = true;
+    }
+    
+    public static void closeLog(){
+    	allowD = false;
+    	allowE = false;
+    	allowI = false;
+    	allowV = false;
+    	allowW = false;
+    	allowWtf = false;
+    }
+    
     /*=========================================================================
      * Verbose
      *========================================================================= 

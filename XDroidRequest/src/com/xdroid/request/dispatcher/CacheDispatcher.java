@@ -5,9 +5,9 @@ import java.util.concurrent.BlockingQueue;
 import com.xdroid.request.base.Request;
 import com.xdroid.request.cache.CacheData;
 import com.xdroid.request.delivered.IDelivery;
+import com.xdroid.request.utils.CLog;
 
 import android.os.Process;
-import android.util.Log;
 
 /**
  * Provides a thread for performing cache triage on a queue of requests.
@@ -15,10 +15,6 @@ import android.util.Log;
  *@since 2015-05-08 16:20:45
  */
 public class CacheDispatcher extends Thread {
-
-    private static final boolean DEBUG = true;
-
-	private static final String Tag = "system.out";
 
     /** The queue of requests coming in for triage. */
     private final BlockingQueue<Request<?>> mCacheQueue;
@@ -70,8 +66,7 @@ public class CacheDispatcher extends Thread {
 
     @Override
     public void run() {
-        if (DEBUG) 
-        	Log.v(Tag,"start new dispatcher");
+        CLog.v("start new dispatcher");
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
         while (true) {
@@ -79,12 +74,12 @@ public class CacheDispatcher extends Thread {
                 // Get a request from the cache triage queue, blocking until
                 // at least one is available.
                 final Request<?> request = mCacheQueue.take();
-                Log.d(Tag,"cache-queue-take");
+                CLog.d("cache-queue-take");
 
                 // If the request has been canceled, don't bother dispatching it.
                 if (request.isCanceled()) {
                     request.finish();
-                    Log.e(Tag, "cache-discard-canceled-----------cacheKey:"+request.getCacheKey());
+                    CLog.e( "cache-discard-canceled-----------cacheKey:"+request.getCacheKey());
                     continue;
                 }
                 // use the cache data always 
@@ -92,14 +87,14 @@ public class CacheDispatcher extends Thread {
                 	CacheData<?> cacheData = request.getCache(request.getCacheKey());
                 	 // Attempt to retrieve this item from cache.
                     if (cacheData == null) {
-                        Log.d(Tag,"cache-miss");
+                        CLog.d("cache-miss");
                         // Cache miss; send off to the network dispatcher.
                         mNetworkQueue.put(request);
                         continue;
                     }
 
                     // We have a cache hit; parse its data for delivery back to the request.
-                    Log.d(Tag,"cache-hit");
+                    CLog.d("cache-hit");
                     
                     //hand in main thread to call "onCacheDataLoadFinish"
                     /*Message msg = handler.obtainMessage(); 
@@ -121,7 +116,7 @@ public class CacheDispatcher extends Thread {
                 	CacheData<?> cacheData = request.getCache(request.getCacheKey());
                 	 // Attempt to retrieve this item from cache.
                     if ( cacheData == null) {
-                        Log.d(Tag,"cache-miss");
+                        CLog.d("cache-miss");
                         // Cache miss; send off to the network dispatcher.
                         mNetworkQueue.put(request);
                         continue;
@@ -129,14 +124,14 @@ public class CacheDispatcher extends Thread {
 
                     // If it is completely expired, just send it to the network.
                     if (cacheData.isExpired()) {
-                    	Log.d(Tag,"cache-hit-expired");
+                    	CLog.d("cache-hit-expired");
                         //request.setCacheEntry(entry);
                         mNetworkQueue.put(request);
                         continue;
                     }
 
                     // We have a cache hit; parse its data for delivery back to the request.
-                    Log.d(Tag,"cache-hit");
+                    CLog.d("cache-hit");
 
                     //hand in main thread to call "onCacheDataLoadFinish"
                     /*Message msg = handler.obtainMessage(); 

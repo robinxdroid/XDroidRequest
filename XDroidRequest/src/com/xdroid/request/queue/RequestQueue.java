@@ -19,10 +19,10 @@ import com.xdroid.request.dispatcher.NetworkDispatcher;
 import com.xdroid.request.network.HttpStack;
 import com.xdroid.request.network.HurlStack;
 import com.xdroid.request.network.Network;
+import com.xdroid.request.utils.CLog;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 /**
  * A request dispatch queue with a thread pool of dispatchers.
@@ -31,9 +31,6 @@ import android.util.Log;
  */
 public class RequestQueue {
 	
-	private static final boolean DEBUG = true;
-	private static final String Tag = "system.out";
-
     /** Used for generating monotonically-increasing sequence numbers for requests. */
     private AtomicInteger mSequenceGenerator = new AtomicInteger();
 
@@ -205,7 +202,7 @@ public class RequestQueue {
 
         // Process requests in the order they are added.
         request.setSequence(getSequenceNumber());
-        Log.v(Tag,"add-to-queue");
+        CLog.v("add-to-queue");
 
         // If the request is uncacheable, skip the cache queue and go straight to the network.
         if (!request.getRequestCacheConfig().isShouldCache()) {
@@ -224,9 +221,7 @@ public class RequestQueue {
                 }
                 stagedRequests.add(request);
                 mWaitingRequests.put(cacheKey, stagedRequests);
-                if (DEBUG) {
-                    Log.i(Tag,"Request for cacheKey="+cacheKey+" is in flight, putting on hold.");
-                }
+                CLog.i("Request for cacheKey="+cacheKey+" is in flight, putting on hold.");
             } else {
                 // Insert 'null' queue for this cacheKey, indicating there is now a request in
                 // flight.
@@ -255,9 +250,7 @@ public class RequestQueue {
                 String cacheKey = request.getCacheKey();
                 Queue<Request<?>> waitingRequests = mWaitingRequests.remove(cacheKey);
                 if (waitingRequests != null) {
-                    if (DEBUG) {
-                        Log.i(Tag,"Releasing "+waitingRequests.size()+" waiting requests for cacheKey="+cacheKey);
-                    }
+                    CLog.i("Releasing "+waitingRequests.size()+" waiting requests for cacheKey="+cacheKey);
                     // Process all queued up requests. They won't be considered as in flight, but
                     // that's not a problem as the cache has been primed by 'request'.
                     mCacheQueue.addAll(waitingRequests);

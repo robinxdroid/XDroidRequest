@@ -19,7 +19,6 @@ import android.annotation.TargetApi;
 import android.net.TrafficStats;
 import android.os.Build;
 import android.os.Process;
-import android.util.Log;
 
 /**
  * Provides a thread for performing network dispatch from a queue of requests.
@@ -27,7 +26,6 @@ import android.util.Log;
  *@since 2015-05-08 12:30
  */
 public class NetworkDispatcher extends Thread {
-    private static final String Tag = "system.out";
 	/** The queue of requests to service. */
     private final BlockingQueue<Request<?>> mQueue;
     
@@ -84,13 +82,13 @@ public class NetworkDispatcher extends Thread {
             }
 
             try {
-               Log.d(Tag,"network-queue-take");
+               CLog.d("network-queue-take");
 
                 // If the request was cancelled already, do not perform the
                 // network request.
                 if (request.isCanceled()) {
                     request.finish();
-                    Log.e(Tag, "cache-discard-canceled-----------cacheKey:"+request.getCacheKey());
+                    CLog.e("cache-discard-canceled-----------cacheKey:"+request.getCacheKey());
                     continue;
                 }
 
@@ -135,10 +133,10 @@ public class NetworkDispatcher extends Thread {
                 }
                 
             }catch (HttpException e) {
-                Log.e(Tag, "network-http-error NetworkDispatcher Unhandled exception : "+ e.toString());
+                CLog.e( "network-http-error NetworkDispatcher Unhandled exception : "+ e.toString());
                 mDelivery.postError(request, e);
             } catch (Exception e) {
-                Log.e(Tag, "network-http-error NetworkDispatcher Unhandled exception : "+ e.toString());
+                CLog.e( "network-http-error NetworkDispatcher Unhandled exception : "+ e.toString());
                 mDelivery.postError(request, new HttpException(e.getMessage()));
             }
         }
