@@ -221,6 +221,7 @@ XRequest.getInstance().download(mRequestTag, url, downloadPath,fileName, new OnR
 ```
 
 ⑥关于回调
+
  请求回调OnRequestListener，回调函数很多，根据自己需求选择性复写即可，传入OnRequestListener默认实现类OnRequestListenerAdapter即可
 ```java
 XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequestListener<String>() {
@@ -407,6 +408,7 @@ XRequest.getInstance().sendPost(mRequestTag, url, params, CityRootBean.class, ne
 });
 ```
 ⑧缓存配置
+
 (1)初始化的时候如果想要指定缓存路径，大小等信息，可参照如下代码
 ```java
 public class App extends Application {
@@ -449,6 +451,7 @@ long diskCacheMaxSize = RequestCacheManager.getInstance().getDiskCacheMaxSize();
 RequestCacheManager.getInstance().deleteAllDiskCacheData();
 ```
 ⑨请求配置
+
 在发送请求的时候，有的重载函数需要传入一个RequestCacheConfig对象，不需要传入此对象的重载函数内部传入的是默认的
 RequestCacheConfig对象，通过RequestCacheConfig对象控制缓存于网络数据等，下面是默认的RequestCacheConfig配置
 ```java
@@ -470,9 +473,11 @@ public static RequestCacheConfig buildDefaultCacheConfig() {
 	return cacheConfig;
 }
 
-每次请求如果需要重新指定配置，自己构造这样一个对象传入即可
 ```
+每次请求如果需要重新指定配置，自己构造这样一个对象传入即可
+
 ⑩原始发送请求方式
+
 XRequest其实是使用装饰者模式，对一系列请求步骤进行了封装，目的是为了更简单的使用，如果有复杂的需求，需要更高的自由度的话，
 可以参考如下发送请求代码
 ```java
@@ -484,11 +489,13 @@ request.setTag(tag);
 XRequest.getInstance().addToRequestQueue(request);
 ```
 ⑪设置优先级
+
 优先级分为4档，IMMEDIATE > HIGH > NORMAL > LOW ,优先级越高的请求优先进行
 ```java
 request.setPriority(Priority.NORMAL);
 ```
 ⑫自定义解析方式
+
 如果需要对请求的结果进行自定义，只需继承MultipartRequest<T>，重写parseNetworkResponse函数即可
 如下是把请求结果转换成String字符串
 ```java
@@ -512,6 +519,7 @@ public class StringRequest extends MultipartRequest<String> {
 ```
 
 ⑬自定义请求方式
+
 自定义请求方式，这个需要你自己构造请求体，以及怎么传入参数相关逻辑，只需继承Request<T>，重写buildBody(HttpURLConnection connection)
 
 可参照MultipartRequest<T>实现
@@ -530,14 +538,15 @@ public class StringRequest extends MultipartRequest<String> {
 ```java
 XRequest.getInstance().shutdown(); 
 ```
-⑯
+⑯更多
 
-⑰
+欢迎自行探索Y(^_^)Y
 
-⑱
-
-⑲
-
-⑳
+#Thanks
+[DiskLruCache](https://github.com/JakeWharton/DiskLruCache)<br>
+[android-volley](https://github.com/mcxiaoke/android-volley)
+#About me
+Email:735506404@robinx.net<br>
+Blog:[www.robinx.net](http://www.robinx.net)
 
 
