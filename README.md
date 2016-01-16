@@ -524,6 +524,9 @@ public class StringRequest extends MultipartRequest<String> {
 
 可参照MultipartRequest<T>实现
 
+如果你想传输层使用okhttp等请求框架实现，可以参照HurlStack实现HttpStack，然后在初始化Network对象的地方传入你自定义的HttpStack
+实现类，不过这个要求你自行修改源码
+
 ⑭取消请求
 ```java
 // 取消指定请求(两种方式都可以)
