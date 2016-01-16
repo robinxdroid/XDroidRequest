@@ -541,7 +541,17 @@ public class StringRequest extends MultipartRequest<String> {
 ```java
 XRequest.getInstance().shutdown(); 
 ```
-⑯更多
+⑯Log控制
+开启Log:
+```java
+Clog.openLog();
+```
+关闭Log:
+```java
+Clog.closeLog();
+```
+
+⑰更多
 
 欢迎自行探索Y(^_^)Y
 
