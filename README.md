@@ -178,7 +178,29 @@ XRequest.getInstance().upload(mRequestTag, url,  params, new OnRequestListenerAd
 
 });
 ```
+测试了上传百兆以上文件无压力，如果你想测试多文件上传，下面的PHP多文件上传代码供参考。要注意的是PHP默认上传2M以内文件，需要自己改下
+配置文件，网上很多，搜索即可
+```java
+<?php
+ foreach($_FILES['file']['error'] as $k=>$v)
+ {
+    $uploadfile = './upload/'. basename($_FILES['file']['name'][$k]);
+    if (move_uploaded_file($_FILES['file']['tmp_name'][$k], $uploadfile)) 
+    {
+        echo "File : ", $_FILES['file']['name'][$k] ," is valid, and was successfully uploaded.\n";
+    }
 
+    else 
+    {
+        echo "Possible file : ", $_FILES['file']['name'][$k], " upload attack!\n";
+    }   
+
+ }
+
+ echo "成功接收附加字段:". $_POST['file_name'];
+
+?>
+```
 ⑤下载文件
 ```java
 String url = "http://192.168.1.150/upload/xiaokaxiu.apk";
@@ -371,23 +393,143 @@ XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequest
 	}
 ```
 ⑦自动解析
+```java
+String url = "http://apis.baidu.com/apistore/aqiservice/citylist";
+RequestParams params = new RequestParams();
+params.putHeaders("apikey", "可以到apistore申请");
+XRequest.getInstance().sendPost(mRequestTag, url, params, CityRootBean.class, new OnRequestListenerAdapter<CityRootBean<CityBean>>() {
 
+	@Override
+	public void onDone(Request<?> request, Map<String, String> headers, CityRootBean<CityBean> result,
+			DataType dataType) {
+		CLog.i("Bean信息:" + (result == null ? "null" : result.toString()));
+	}
+});
+```
 ⑧缓存配置
+(1)初始化的时候如果想要指定缓存路径，大小等信息，可参照如下代码
+```java
+public class App extends Application {
 
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		
+		configXReqeustCache();
+		
+	}
+
+	@SuppressLint("SdCardPath")
+	private void configXReqeustCache() {
+		//磁盘缓存路径
+		File DISK_CACHE_DIR_PATH = new File("/sdcard/xrequest/diskcache");
+		//磁盘缓存最大值
+		int DISK_CACHE_MAX_SIZE = 30*1024*1024;
+		
+		//XRequest.initXRequest(getApplicationContext());
+		
+		XRequest.initXRequest(getApplicationContext(), DISK_CACHE_MAX_SIZE, DISK_CACHE_DIR_PATH);
+	}
+}
+```
+(2)查找当前缓存数据占用的空间
+```java
+long diskCacheCurrentSize = RequestCacheManager.getInstance().getAllDiskCacheSize();
+```
+(3)查找缓存路径
+```java
+String diskCacheDir = RequestCacheManager.getInstance().getDiskCacheDirectory().getPath();
+```
+(4)查询当前缓存最大值
+```java
+long diskCacheMaxSize = RequestCacheManager.getInstance().getDiskCacheMaxSize();
+```
+(5)清除所有缓存
+```java
+RequestCacheManager.getInstance().deleteAllDiskCacheData();
+```
 ⑨请求配置
+在发送请求的时候，有的重载函数需要传入一个RequestCacheConfig对象，不需要传入此对象的重载函数内部传入的是默认的
+RequestCacheConfig对象，通过RequestCacheConfig对象控制缓存于网络数据等，下面是默认的RequestCacheConfig配置
+```java
+public static RequestCacheConfig buildDefaultCacheConfig() {
+        RequestCacheConfig cacheConfig=new RequestCacheConfig();
+	cacheConfig.setShouldCache(true);  //开启缓存
+	cacheConfig.setUseCacheDataAnyway(false);  //关闭总是优先使用缓存
+	cacheConfig.setUseCacheDataWhenRequestFailed(true); //开启请求失败使用缓存
+	cacheConfig.setUseCacheDataWhenTimeout(false); //关闭超时使用缓存
+	cacheConfig.setUseCacheDataWhenUnexpired(true);  //开启当缓存未过期时使用缓存
+	cacheConfig.setRetryWhenRequestFailed(true); //开启请求失败重试
+	cacheConfig.setNeverExpired(false); //关闭缓存永不过期
+		
+	TimeController timeController=new TimeController();
+	timeController.setExpirationTime(DEFAULT_EXPIRATION_TIME); //设置缓存的过期时间
+	timeController.setTimeout(DEFAULT_TIMEOUT); //设置缓存超时时间，对应“setUseCacheDataWhenTimeout”函数的超时时间
+	cacheConfig.setTimeController(timeController); //把时间控制器设置给RequestCacheConfig
+		
+	return cacheConfig;
+}
 
+每次请求如果需要重新指定配置，自己构造这样一个对象传入即可
+```
 ⑩原始发送请求方式
+XRequest其实是使用装饰者模式，对一系列请求步骤进行了封装，目的是为了更简单的使用，如果有复杂的需求，需要更高的自由度的话，
+可以参考如下发送请求代码
+```java
+MultipartGsonRequest<Bean> request = new MultipartGsonRequest<T>(cacheConfig, url, cacheKey, Bean.class, onRequestListener);
+request.setRequestParams(params);
+request.setHttpMethod(HttpMethod.POST);
+request.setTag(tag);
 
+XRequest.getInstance().addToRequestQueue(request);
+```
 ⑪设置优先级
-
+优先级分为4档，IMMEDIATE > HIGH > NORMAL > LOW ,优先级越高的请求优先进行
+```java
+request.setPriority(Priority.NORMAL);
+```
 ⑫自定义解析方式
+如果需要对请求的结果进行自定义，只需继承MultipartRequest<T>，重写parseNetworkResponse函数即可
+如下是把请求结果转换成String字符串
+```java
+public class StringRequest extends MultipartRequest<String> {
+	
+	public StringRequest() {
+		super();
+	}
+
+	public StringRequest(RequestCacheConfig cacheConfig, String url, String cacheKey,
+			OnRequestListener<String> onRequestListener) {
+		super(cacheConfig, url, cacheKey, onRequestListener);
+	}
+
+	@Override
+	public Response<String> parseNetworkResponse(NetworkResponse response) {
+		   return Response.success(new String(response.data), response.headers);
+	}
+
+}
+```
 
 ⑬自定义请求方式
+自定义请求方式，这个需要你自己构造请求体，以及怎么传入参数相关逻辑，只需继承Request<T>，重写buildBody(HttpURLConnection connection)
+
+可参照MultipartRequest<T>实现
 
 ⑭取消请求
+```java
+// 取消指定请求(两种方式都可以)
+// request.cancel();
+// XRequest.getInstance().cancelRequest(request);
 
+// 取消队列中的所有相同tag请求(两种方式都可以)
+ //request.getRequestQueue().cancelAll(mRequestTag);
+ XRequest.getInstance().cancelAllRequestInQueueByTag(mRequestTag);
+```
 ⑮关闭请求
-
+```java
+XRequest.getInstance().shutdown(); 
+```
 ⑯
 
 ⑰
