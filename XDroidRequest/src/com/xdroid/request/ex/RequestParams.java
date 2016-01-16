@@ -165,5 +165,13 @@ public class RequestParams extends ConcurrentHashMap<String, Object> {
 	public boolean hasNameValuePairInParams(){
 		return buildParameters().length() > 0;
 	}
+
+	@Override
+	public String toString() {
+		if (!TextUtils.isEmpty(mJsonParams)) {
+			return mJsonParams;
+		}
+		return super.toString();
+	}
 	
 }
