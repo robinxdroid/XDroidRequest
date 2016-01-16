@@ -456,7 +456,7 @@ RequestCacheManager.getInstance().deleteAllDiskCacheData();
 RequestCacheConfig对象，通过RequestCacheConfig对象控制缓存于网络数据等，下面是默认的RequestCacheConfig配置
 ```java
 public static RequestCacheConfig buildDefaultCacheConfig() {
-        RequestCacheConfig cacheConfig=new RequestCacheConfig();
+RequestCacheConfig cacheConfig=new RequestCacheConfig();
 	cacheConfig.setShouldCache(true);  //开启缓存
 	cacheConfig.setUseCacheDataAnyway(false);  //关闭总是优先使用缓存
 	cacheConfig.setUseCacheDataWhenRequestFailed(true); //开启请求失败使用缓存
@@ -530,8 +530,8 @@ public class StringRequest extends MultipartRequest<String> {
 ⑭取消请求
 ```java
 // 取消指定请求(两种方式都可以)
-// request.cancel();
-// XRequest.getInstance().cancelRequest(request);
+ // request.cancel();
+ XRequest.getInstance().cancelRequest(request);
 
 // 取消队列中的所有相同tag请求(两种方式都可以)
  //request.getRequestQueue().cancelAll(mRequestTag);
