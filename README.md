@@ -542,6 +542,7 @@ public class StringRequest extends MultipartRequest<String> {
 XRequest.getInstance().shutdown(); 
 ```
 ⑯Log控制
+
 开启Log:
 ```java
 Clog.openLog();
