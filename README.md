@@ -5,7 +5,8 @@
 
 ### Provide ###
     
-    1 适配 Android 6.0 ,不再使用HttpClient相关API
+    1 不再使用HttpClient相关API，因为Android 6.0删除Apache HttpClient相关API,虽然我们可以自己引用,但是既然谷歌删除，还是跟着老大走吧，
+    所以本项目没有任何HttpClient相关API.
     2 一行代码发送请求，提供多种回调函数供选择,
     3 支持8种网络请求方式 GET，POST，PUT，DELETE，HEAD，OPTIONS，TRACE，PATCH
     4 支持请求的优先级设置，优先级高的将先于优先级低的发送请求
@@ -523,8 +524,8 @@ public class StringRequest extends MultipartRequest<String> {
 
 可参照MultipartRequest<T>实现
 
-如果你想传输层使用okhttp等请求框架实现，可以参照HurlStack实现HttpStack，然后在初始化Network对象的地方传入你自定义的HttpStack
-实现类，不过这个要求你自行修改源码
+有的兄弟喜欢okhttp,如果你想传输层使用okhttp等请求框架实现，可以参照HurlStack实现HttpStack，然后在初始化Network对象的地方传入你自定义的HttpStack
+实现类，不过这个暂时要求你自行修改源码,后面在维护中将会加入HttpStack切换功能
 
 ⑭取消请求
 ```java
