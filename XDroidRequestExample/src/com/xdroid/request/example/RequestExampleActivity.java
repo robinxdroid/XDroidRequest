@@ -8,6 +8,7 @@ import com.xdroid.request.XRequest;
 import com.xdroid.request.base.Request;
 import com.xdroid.request.cache.RequestCacheManager;
 import com.xdroid.request.config.DataType;
+import com.xdroid.request.ex.ImageRequest;
 import com.xdroid.request.ex.RequestParams;
 import com.xdroid.request.example.CityRootBean.CityBean;
 import com.xdroid.request.example.RecipeRootBean.RecipeBean;
@@ -27,6 +28,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,6 +44,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -58,6 +61,8 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	
 	private ProgressBar mUploadProgressBar ;
 	private ProgressBar mDownloadProgressBar ;
+	
+	private ImageView mLoadImageView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +82,7 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	 */
 	private void initView() {
 		int[] ids = new int[] { R.id.btn_post, R.id.btn_get, R.id.btn_json_post, 
-				R.id.btn_file_upload, R.id.btn_custom, R.id.btn_custom_list ,R.id.btn_file_download};
+				R.id.btn_file_upload, R.id.btn_custom, R.id.btn_custom_list ,R.id.btn_file_download,R.id.btn_load_image};
 		for (int i = 0; i < ids.length; i++) {
 			findViewById(ids[i]).setOnClickListener(this);
 		}
@@ -89,6 +94,7 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 		Button deleteButton = (Button) findViewById(R.id.btn_delete);
 		mUploadProgressBar = (ProgressBar) findViewById(R.id.pb_upload);
 		mDownloadProgressBar = (ProgressBar) findViewById(R.id.pb_download);
+		mLoadImageView = (ImageView) findViewById(R.id.img);
 		
 		//刷新当前缓存数据
 		refreshButton.setOnClickListener(new OnClickListener() {
@@ -151,6 +157,24 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 		case R.id.btn_custom_list:
 			convertToBeanList();
 			break;
+		case R.id.btn_load_image:
+//			String url = "http://192.168.1.150/download/pic.png";
+			String url = "https://raw.githubusercontent.com/robinxdroid/XDroidCache/master/screenshoot3.png";
+			ImageRequest request = new ImageRequest(url, new OnRequestListenerAdapter<Bitmap>() {
+				
+				public void onRequestDownloadProgress(Request<?> request, long transferredBytesSize, long totalSize) {
+					CLog.i("正在加载图片， 当前进度：%d , 总大小 : %d" ,transferredBytesSize,totalSize);
+				}
+				
+				@Override
+				public void onDone(Request<?> request, Map<String, String> headers, Bitmap result, DataType dataType) {
+					super.onDone(request, headers, result, dataType);
+					mLoadImageView.setImageBitmap(result);
+					CLog.i(request.getRequestCacheConfig().toString());
+				}
+			});
+			XRequest.getInstance().addToRequestQueue(request);
+			break;
 
 		}
 	}
@@ -167,7 +191,7 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	private void post() {
 		String url = "http://apis.baidu.com/heweather/weather/free";
 		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "可以去apistore获取一个");
+		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
 		params.putParams("city", "hefei");
 
 		String cacheKey = url + "post";  //与GET请求的URL一样，为了避免同样的缓存key、这里重新指定缓存key
@@ -215,7 +239,7 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	private void get() {
 		String url = "http://apis.baidu.com/heweather/weather/free";
 		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "可以去apistore获取一个");
+		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
 		params.putParams("city", "hefei");
 
 		String cacheKey = url + "get";  //与POST请求的URL一样，为了避免同样的缓存key、这里重新指定缓存key
@@ -458,7 +482,7 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	private void convertToBean() {
 		String url = "http://apis.baidu.com/apistore/aqiservice/citylist";
 		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "可以去apistore获取一个");
+		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
 		XRequest.getInstance().sendPost(mRequestTag, url, params, CityRootBean.class, new OnRequestListener<CityRootBean<CityBean>>() {
 
 			@Override
@@ -514,7 +538,7 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	private void convertToBeanList() {
 		String url = "http://apis.baidu.com/tngou/cook/name";
 		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "可以去apistore获取一个");
+		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
 		params.putParams("name", "炒饭");
 		XRequest.getInstance().sendPost(mRequestTag, url, params, RecipeRootBean.class, new OnRequestListenerAdapter<RecipeRootBean<RecipeBean>>() {
 			

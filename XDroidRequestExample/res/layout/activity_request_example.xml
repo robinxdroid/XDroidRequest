@@ -233,6 +233,34 @@
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
+            
+            <LinearLayout 
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:orientation="horizontal"
+                android:layout_margin="5dp"
+                android:gravity="center_vertical"
+                android:background="@color/simple_red"
+                >
+    
+                    <Button
+                        android:id="@+id/btn_load_image"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@android:color/white"
+                        android:text="LoadImage"
+                        android:textColor="@color/simple_red"
+                        android:textSize="14sp" />            
+                
+                    <ImageView 
+                        android:id="@+id/img"
+                        android:layout_width="110dp"
+                        android:layout_height="110dp"
+                        />
+                
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
