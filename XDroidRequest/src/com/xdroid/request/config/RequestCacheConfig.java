@@ -201,7 +201,7 @@ public class RequestCacheConfig {
 		cacheConfig.setUseCacheDataWhenRequestFailed(false); 
 		cacheConfig.setUseCacheDataWhenTimeout(false);
 		cacheConfig.setUseCacheDataWhenUnexpired(true);  
-		cacheConfig.setRetryWhenRequestFailed(false);
+		cacheConfig.setRetryWhenRequestFailed(true);
 		cacheConfig.setNeverExpired(true);
 		
 		TimeController timeController=new TimeController();
