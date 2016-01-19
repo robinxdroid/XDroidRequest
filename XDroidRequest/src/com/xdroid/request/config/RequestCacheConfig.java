@@ -144,8 +144,16 @@ public class RequestCacheConfig {
 		this.timeController = timeController;
 		return this;
 	}
-
 	
+	@Override
+	public String toString() {
+		return "RequestCacheConfig [shouldCache=" + shouldCache + ", useCacheDataAnyway=" + useCacheDataAnyway
+				+ ", useCacheDataWhenRequestFailed=" + useCacheDataWhenRequestFailed + ", useCacheDataWhenUnexpired="
+				+ useCacheDataWhenUnexpired + ", useCacheDataWhenTimeout=" + useCacheDataWhenTimeout
+				+ ", retryWhenRequestFailed=" + retryWhenRequestFailed + ", isNeverExpired=" + isNeverExpired
+				+ ", timeController=" + timeController + "]";
+	}
+
 	/**
 	 * create a default cache configuration when cacheConfig is null
 	 * @return
@@ -180,6 +188,23 @@ public class RequestCacheConfig {
 		
 		TimeController timeController=new TimeController();
 		timeController.setExpirationTime(0);
+		timeController.setTimeout(DEFAULT_TIMEOUT);
+		cacheConfig.setTimeController(timeController);
+		
+		return cacheConfig;
+	}
+	
+	public static RequestCacheConfig buildImageCacheConfig() {
+		RequestCacheConfig cacheConfig=new RequestCacheConfig();
+		cacheConfig.setShouldCache(true); 
+		cacheConfig.setUseCacheDataAnyway(false); 
+		cacheConfig.setUseCacheDataWhenRequestFailed(false); 
+		cacheConfig.setUseCacheDataWhenTimeout(false);
+		cacheConfig.setUseCacheDataWhenUnexpired(true);  
+		cacheConfig.setRetryWhenRequestFailed(false);
+		cacheConfig.setNeverExpired(true);
+		
+		TimeController timeController=new TimeController();
 		timeController.setTimeout(DEFAULT_TIMEOUT);
 		cacheConfig.setTimeController(timeController);
 		

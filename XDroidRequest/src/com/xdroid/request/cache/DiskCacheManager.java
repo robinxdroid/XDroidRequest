@@ -13,6 +13,9 @@ import java.security.NoSuchAlgorithmException;
 import com.xdroid.request.cache.diskcache.DiskLruCache;
 import com.xdroid.request.interfaces.OnCacheDataListener;
 
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 
 /**
@@ -86,7 +89,26 @@ public class DiskCacheManager <ValueType>{
                  OutputStream outputStream = editor.newOutputStream(0);  
                  ObjectOutputStream oos=new ObjectOutputStream(outputStream);
                  if (value!=null) {
-					oos.writeObject(value);
+                	 
+                	 if (value instanceof CacheData<?>) {
+						@SuppressWarnings("unchecked")
+						CacheData<Entry<?>> cacheData = (CacheData<Entry<?>>) value;
+						if (cacheData.getEntry().result instanceof Bitmap) {
+							Bitmap bitmap = (Bitmap) cacheData.getEntry().result;
+							ByteArrayOutputStream baops = new ByteArrayOutputStream();  
+					        bitmap.compress(CompressFormat.PNG, 0, baops);  
+					        BitmapCache bitmapCache = new BitmapCache(baops.toByteArray(), "bitmap_cache.png");
+					        
+					        Entry<BitmapCache> entry = new Entry<BitmapCache>(bitmapCache, cacheData.getEntry().responseHeaders);
+					        CacheData<Entry<BitmapCache>> bitmapCacheData = new CacheData<Entry<BitmapCache>>(entry, cacheData.getExpirationTime(), cacheData.getWriteTime(), cacheData.isNeverExpiry());
+					    	oos.writeObject(bitmapCacheData);
+						}else {
+							oos.writeObject(value);
+						}
+					}else {
+						oos.writeObject(value);
+					}
+
 				}
                  /*if (oos!=null) {
 					oos.close();
@@ -135,6 +157,7 @@ public class DiskCacheManager <ValueType>{
 	 * read the data from disk cache
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public ValueType getDataFromDiskCache(String originalKey){
 		if (mDiskLruCache == null || mDiskLruCache.isClosed()) {
 			open();
@@ -146,8 +169,22 @@ public class DiskCacheManager <ValueType>{
 			        InputStream is = snapShot.getInputStream(0);  
 			        ObjectInputStream ois=new ObjectInputStream(is);
 			        try {
-			        	@SuppressWarnings("unchecked")
 						ValueType value=(ValueType) ois.readObject();
+			        	
+			        	if (value instanceof CacheData<?>) {
+							CacheData<Entry<?>> cacheData = (CacheData<Entry<?>>) value;
+							if (cacheData.getEntry().result instanceof BitmapCache) {
+								BitmapCache bitmapCache = (BitmapCache) cacheData.getEntry().result;
+								byte[] data = bitmapCache.getBitmapBytes();
+								Bitmap resultBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+								
+								  Entry<Bitmap> entry = new Entry<Bitmap>(resultBitmap, cacheData.getEntry().responseHeaders);
+							      CacheData<Entry<Bitmap>> bitmapCacheData = new CacheData<Entry<Bitmap>>(entry, cacheData.getExpirationTime(), cacheData.getWriteTime(), cacheData.isNeverExpiry());
+							      
+							      return (ValueType) bitmapCacheData;
+							}
+						}
+			        	
 						return value;
 					} catch (Exception e) {
 						e.printStackTrace();

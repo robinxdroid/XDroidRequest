@@ -28,4 +28,9 @@ public class TimeController {
 		this.timeout = timeout;
 	}
 
+	@Override
+	public String toString() {
+		return "TimeController [expirationTime=" + expirationTime + ", timeout=" + timeout + "]";
+	}
+	
 }
