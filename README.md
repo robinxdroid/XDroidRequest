@@ -54,7 +54,7 @@
 ### Usage ###
 
 **1.初始化，应用启动的时候进行，主要初始化缓存的路径等信息.有同学认为使用框架在Application中初始化是个
-不太好的实现，会有种麻烦多余的感觉，此框架设计之初并不需要这样的操作，因为框架内部设计到网络判定此类功能
+不太好的实现，会有种麻烦多余的感觉，此框架设计之初并不需要这样的操作，因为框架内部涉及到网络判定此类功能
 需要传入Context，在“每发起一个请求传入Context”与“初始化时传入Context”两种方式中，选择了后者**
 
 ```java
@@ -214,6 +214,7 @@ XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequest
 
 **4.缓存配置**：
 
+
 (1)初始化的时候如果想要指定缓存路径，大小等信息，可参照如下代码
 ```java
 public class App extends Application {
@@ -337,6 +338,8 @@ public class StringRequest extends MultipartRequest<String> {
 实现类，不过这个暂时要求你自行修改源码,后面在维护中将会加入HttpStack切换功能
 
 **10.其他设置**：
+
+
 (1).取消请求
 ```java
 // 取消指定请求(两种方式都可以)
@@ -363,7 +366,7 @@ Clog.closeLog();
 ```
 
 **11.请求示例**：
-③POST请求
+(1)POST请求
 ```java
 String url = "http://apis.baidu.com/heweather/weather/free";
 RequestParams params = new RequestParams();
@@ -379,7 +382,7 @@ XRequest.getInstance().sendPost(mRequestTag, url,  params, new OnRequestListener
 });
 ```
 
-④ 发送JSON字符串参数
+(2)发送JSON字符串参数
 ```java
 RequestParams params = new RequestParams();
 params.putParams(
@@ -391,7 +394,7 @@ XRequest.getInstance().sendPost(mRequestTag, url, params, new OnRequestListenerA
 	}
 });
 ```
-⑤上传文件
+(3)上传文件
 ```java
 String url = "http://192.168.1.150/upload_multi.php";
 RequestParams params = new RequestParams();
@@ -442,7 +445,7 @@ XRequest.getInstance().upload(mRequestTag, url,  params, new OnRequestListenerAd
 
 ?>
 ```
-⑥下载文件
+(4)下载文件
 ```java
 String url = "http://192.168.1.150/upload/xiaokaxiu.apk";
 String downloadPath = "/sdcard/xrequest/download";
@@ -461,7 +464,7 @@ XRequest.getInstance().download(mRequestTag, url, downloadPath,fileName, new OnR
 });
 ```
 
-⑦自动解析
+(5)自动解析
 ```java
 String url = "http://apis.baidu.com/apistore/aqiservice/citylist";
 RequestParams params = new RequestParams();
