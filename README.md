@@ -289,7 +289,7 @@ RequestCacheConfig cacheConfig=new RequestCacheConfig();
 XRequest其实是使用装饰者模式，对一系列请求步骤进行了封装，目的是为了更简单的使用，如果有复杂的需求，需要更高的自由度的话，
 可以参考如下发送请求代码
 ```java
-MultipartGsonRequest<Bean> request = new MultipartGsonRequest<T>(cacheConfig, url, cacheKey, Bean.class, onRequestListener);
+MultipartGsonRequest<Bean> request = new MultipartGsonRequest<T>(cacheConfig, url, cacheKey,onRequestListener);
 request.setRequestParams(params);
 request.setHttpMethod(HttpMethod.POST);
 request.setTag(tag);
