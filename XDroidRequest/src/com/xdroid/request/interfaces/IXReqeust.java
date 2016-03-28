@@ -16,13 +16,14 @@ import com.xdroid.request.ex.RequestParams;
  *
  */
 public interface IXReqeust {
-	
+
 	/**
 	 * Best during application initialization calls only once
+	 * 
 	 * @param threadPoolSize
 	 */
 	public void setRequestThreadPoolSize(int threadPoolSize);
-	
+
 	/**
 	 * Add a request to queue to execute
 	 * 
@@ -63,12 +64,12 @@ public interface IXReqeust {
 	 *            instance of activity
 	 */
 	public void cancelAllRequestInQueueByTag(Object tag);
-	
+
 	/**
 	 * Start the request，start the thread pool
 	 */
 	public void start();
-	
+
 	/**
 	 * Close the request, quit all threads, release the request queue
 	 */
@@ -80,29 +81,17 @@ public interface IXReqeust {
 	 * =======================================================================
 	 */
 
-	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, Class<?> beanClass, OnRequestListener<T> onRequestListener);
+	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener);
 
-	public Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, OnRequestListener<String> onRequestListener);
+	public <T> Request<?> sendGet(Object tag, String url, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener);
+	
+	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params, OnRequestListener<T> onRequestListener);
+	
+	public <T> Request<?> sendGet(Object tag, String url, RequestParams params, OnRequestListener<T> onRequestListener);
+	
+	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, OnRequestListener<T> onRequestListener);
 
-	public <T> Request<?> sendGet(Object tag, String url, RequestParams params, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener);
-
-	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener);
-
-	public Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params,
-			OnRequestListener<String> onRequestListener);
-
-	public <T> Request<?> sendGet(Object tag, String url, Class<?> beanClass, OnRequestListener<T> onRequestListener);
-
-	public Request<?> sendGet(Object tag, String url, OnRequestListener<String> onRequestListener);
-
-	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener);
-
-	public Request<?> sendGet(Object tag, String url, String cacheKey, OnRequestListener<String> onRequestListener);
+	public <T> Request<?> sendGet(Object tag, String url, OnRequestListener<T> onRequestListener);
 
 	/*
 	 * =======================================================================
@@ -110,47 +99,13 @@ public interface IXReqeust {
 	 * =======================================================================
 	 */
 
-	public <T> Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, Class<?> beanClass, OnRequestListener<T> onRequestListener);
+	public <T> Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener);
 
-	public Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, OnRequestListener<String> onRequestListener);
-
-	public <T> Request<?> sendPost(Object tag, String url, RequestParams params, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener);
-
-	public Request<?> sendPost(Object tag, String url, RequestParams params,
-			OnRequestListener<String> onRequestListener);
-
-	public <T> Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params,
-			Class<?> beanClass, OnRequestListener<T> onRequestListener);
-
-	public Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params,
-			OnRequestListener<String> onRequestListener);
-
-	/*
-	 * =======================================================================
-	 * Download
-	 * =======================================================================
-	 */
+	public <T> Request<?> sendPost(Object tag, String url, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener);
 	
-	public <T> Request<?> upload(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, Class<?> beanClass, OnRequestListener<T> onRequestListener);
+	public <T> Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params, OnRequestListener<T> onRequestListener);
 	
-	public Request<?> upload(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, OnRequestListener<String> onRequestListener);
-
-	public <T> Request<?> upload(Object tag, String url, RequestParams params, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener);
-
-	public Request<?> upload(Object tag, String url, RequestParams params,
-			OnRequestListener<String> onRequestListener);
-
-	public <T> Request<?> upload(Object tag, String url, String cacheKey, RequestParams params,
-			Class<?> beanClass, OnRequestListener<T> onRequestListener);
-
-	public Request<?> upload(Object tag, String url, String cacheKey, RequestParams params,
-			OnRequestListener<String> onRequestListener);
+	public <T> Request<?> sendPost(Object tag, String url, RequestParams params, OnRequestListener<T> onRequestListener);
 
 	/*
 	 * =======================================================================
@@ -158,9 +113,19 @@ public interface IXReqeust {
 	 * =======================================================================
 	 */
 
-	public Request<?> download(Object tag, String url, String cacheKey, String downloadPath, String fileName,
-			RequestCacheConfig cacheConfig, OnRequestListener<File> onRequestListener);
+	public <T> Request<?> upload(Object tag, String url, String cacheKey, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener);
 
-	public Request<?> download(Object tag, String url, String downloadPath, String fileName,
-			OnRequestListener<File> onRequestListener);
+	public <T> Request<?> upload(Object tag, String url, RequestParams params, OnRequestListener<T> onRequestListener);
+
+	public <T> Request<?> upload(Object tag, String url, String cacheKey, RequestParams params, OnRequestListener<T> onRequestListener);
+
+	/*
+	 * =======================================================================
+	 * Download
+	 * =======================================================================
+	 */
+
+	public Request<?> download(Object tag, String url, String cacheKey, String downloadPath, String fileName, RequestCacheConfig cacheConfig, OnRequestListener<File> onRequestListener);
+
+	public Request<?> download(Object tag, String url, String downloadPath, String fileName, OnRequestListener<File> onRequestListener);
 }

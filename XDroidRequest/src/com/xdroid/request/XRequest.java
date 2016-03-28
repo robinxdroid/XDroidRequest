@@ -38,8 +38,7 @@ public class XRequest implements IXReqeust {
 		return INSTANCE;
 	}
 
-	public static void initXRequest(Context context, long diskCacheMaxSize, File diskCacheDir, int diskCacheAppVersion,
-			int memoryCacheMaxSize) {
+	public static void initXRequest(Context context, long diskCacheMaxSize, File diskCacheDir, int diskCacheAppVersion, int memoryCacheMaxSize) {
 		RequestContext.init(context);
 
 		CacheConfig.DISK_CACHE_MAX_SIZE = diskCacheMaxSize;
@@ -50,19 +49,19 @@ public class XRequest implements IXReqeust {
 
 		CacheConfig.MEMORY_CACHE_MAX_SIZE = memoryCacheMaxSize;
 	}
-	
+
 	public static void initXRequest(Context context, long diskCacheMaxSize, File diskCacheDir, int diskCacheAppVersion) {
 		initXRequest(context, diskCacheMaxSize, diskCacheDir, diskCacheAppVersion, (int) Runtime.getRuntime().maxMemory() / 8);
 	}
-	
+
 	public static void initXRequest(Context context, long diskCacheMaxSize, File diskCacheDir) {
 		initXRequest(context, diskCacheMaxSize, diskCacheDir, AppUtils.getAppVersion(context), (int) Runtime.getRuntime().maxMemory() / 8);
 	}
-	
+
 	public static void initXRequest(Context context, long diskCacheMaxSize) {
 		initXRequest(context, diskCacheMaxSize, AppUtils.getDiskCacheDir(context, "xrequest"), AppUtils.getAppVersion(context), (int) Runtime.getRuntime().maxMemory() / 8);
 	}
-	
+
 	public static void initXRequest(Context context) {
 		RequestContext.init(context);
 		CacheConfig.DISK_CACHE_MAX_SIZE = CacheConfig.DEFAULT_MAX_SIZE;
@@ -70,18 +69,19 @@ public class XRequest implements IXReqeust {
 		CacheConfig.DISK_CACHE_APP_VERSION = AppUtils.getAppVersion(context);
 		CacheConfig.MEMORY_CACHE_MAX_SIZE = (int) Runtime.getRuntime().maxMemory() / 8;
 	}
-	
+
 	private RequestQueue queue;
-	
+
 	/**
 	 * Best during application initialization calls only once
+	 * 
 	 * @param threadPoolSize
 	 */
 	@Override
-	public void setRequestThreadPoolSize(int threadPoolSize){
+	public void setRequestThreadPoolSize(int threadPoolSize) {
 		if (queue != null) {
 			queue.stop();
-			queue =null;
+			queue = null;
 		}
 		queue = new RequestQueue(threadPoolSize);
 		queue.start();
@@ -145,7 +145,7 @@ public class XRequest implements IXReqeust {
 			queue.cancelAll(tag);
 		}
 	}
-	
+
 	/**
 	 * Start the request，start the thread pool
 	 */
@@ -155,7 +155,7 @@ public class XRequest implements IXReqeust {
 			queue.start();
 		}
 	}
-	
+
 	/**
 	 * Close the request, quit all threads, release the request queue
 	 */
@@ -163,7 +163,7 @@ public class XRequest implements IXReqeust {
 	public void shutdown() {
 		if (queue != null) {
 			queue.stop();
-			queue =null;
+			queue = null;
 		}
 	}
 
@@ -174,11 +174,10 @@ public class XRequest implements IXReqeust {
 	 */
 
 	@Override
-	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, Class<?> beanClass, OnRequestListener<T> onRequestListener) {
+	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener) {
 		url += params.buildQueryParameters();
 
-		MultipartGsonRequest<T> request = new MultipartGsonRequest<T>(cacheConfig, url, cacheKey, beanClass, onRequestListener);
+		MultipartGsonRequest<T> request = new MultipartGsonRequest<T>(cacheConfig, url, cacheKey, onRequestListener);
 		request.setRequestParams(params);
 		request.setHttpMethod(HttpMethod.GET);
 		request.setTag(tag);
@@ -190,49 +189,29 @@ public class XRequest implements IXReqeust {
 	}
 
 	@Override
-	public Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, OnRequestListener<String> onRequestListener) {
-		return sendGet(tag, url, cacheKey, params, cacheConfig, String.class, onRequestListener);
-	}
-
-	@Override
-	public <T> Request<?> sendGet(Object tag, String url, RequestParams params, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener) {
+	public <T> Request<?> sendGet(Object tag, String url, RequestParams params, OnRequestListener<T> onRequestListener) {
 		String cacheKey = url;
-		return sendGet(tag, url, cacheKey, params, getDefaultCacheConfig(), beanClass, onRequestListener);
+		return sendGet(tag, url, cacheKey, params, getDefaultCacheConfig(), onRequestListener);
 	}
 
 	@Override
-	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener) {
-		return sendGet(tag, url, cacheKey, params, getDefaultCacheConfig(), beanClass, onRequestListener);
+	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params, OnRequestListener<T> onRequestListener) {
+		return sendGet(tag, url, cacheKey, params, getDefaultCacheConfig(), onRequestListener);
 	}
 
 	@Override
-	public Request<?> sendGet(Object tag, String url, String cacheKey, RequestParams params,
-			OnRequestListener<String> onRequestListener) {
-		return sendGet(tag, url, cacheKey, params, getDefaultCacheConfig(), String.class, onRequestListener);
+	public <T> Request<?> sendGet(Object tag, String url, OnRequestListener<T> onRequestListener) {
+		return sendGet(tag, url, new RequestParams(), onRequestListener);
 	}
 
 	@Override
-	public <T> Request<?> sendGet(Object tag, String url, Class<?> beanClass, OnRequestListener<T> onRequestListener) {
-		return sendGet(tag, url, new RequestParams(), beanClass, onRequestListener);
+	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, OnRequestListener<T> onRequestListener) {
+		return sendGet(tag, url, cacheKey, new RequestParams(), onRequestListener);
 	}
-
+	
 	@Override
-	public Request<?> sendGet(Object tag, String url, OnRequestListener<String> onRequestListener) {
-		return sendGet(tag, url, new RequestParams(), String.class, onRequestListener);
-	}
-
-	@Override
-	public <T> Request<?> sendGet(Object tag, String url, String cacheKey, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener) {
-		return sendGet(tag, url, cacheKey, new RequestParams(), beanClass, onRequestListener);
-	}
-
-	@Override
-	public Request<?> sendGet(Object tag, String url, String cacheKey, OnRequestListener<String> onRequestListener) {
-		return sendGet(tag, url, cacheKey, new RequestParams(), String.class, onRequestListener);
+	public <T> Request<?> sendGet(Object tag, String url, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener) {
+		return sendGet(tag, url, url, params, cacheConfig, onRequestListener);
 	}
 
 	/*
@@ -242,9 +221,8 @@ public class XRequest implements IXReqeust {
 	 */
 
 	@Override
-	public <T> Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, Class<?> beanClass, OnRequestListener<T> onRequestListener) {
-		MultipartGsonRequest<T> request = new MultipartGsonRequest<T>(cacheConfig, url, cacheKey, beanClass, onRequestListener);
+	public <T> Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener) {
+		MultipartGsonRequest<T> request = new MultipartGsonRequest<T>(cacheConfig, url, cacheKey, onRequestListener);
 		request.setRequestParams(params);
 		request.setHttpMethod(HttpMethod.POST);
 		request.setTag(tag);
@@ -253,83 +231,44 @@ public class XRequest implements IXReqeust {
 
 		return request;
 	}
-
-	@Override
-	public Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, OnRequestListener<String> onRequestListener) {
-		return sendPost(tag, url, cacheKey, params, cacheConfig, String.class, onRequestListener);
-	}
-
-	@Override
-	public <T> Request<?> sendPost(Object tag, String url, RequestParams params, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener) {
-		String cacheKey = url;
-		return sendPost(tag, url, cacheKey, params, getDefaultCacheConfig(), beanClass, onRequestListener);
-	}
-
-	@Override
-	public Request<?> sendPost(Object tag, String url, RequestParams params,
-			OnRequestListener<String> onRequestListener) {
-		String cacheKey = url;
-		return sendPost(tag, url, cacheKey, params, getDefaultCacheConfig(), String.class, onRequestListener);
-	}
-
-	@Override
-	public <T> Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params,
-			Class<?> beanClass, OnRequestListener<T> onRequestListener) {
-		return sendPost(tag, url, cacheKey, params, getDefaultCacheConfig(), beanClass, onRequestListener);
-	}
-
-	@Override
-	public Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params,
-			OnRequestListener<String> onRequestListener) {
-		return sendPost(tag, url, cacheKey, params, getDefaultCacheConfig(), String.class, onRequestListener);
-	}
 	
+	@Override
+	public <T> Request<?> sendPost(Object tag, String url, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener) {
+		return sendPost(tag, url, url, params, cacheConfig, onRequestListener);
+	}
+
+	@Override
+	public <T> Request<?> sendPost(Object tag, String url, RequestParams params, OnRequestListener<T> onRequestListener) {
+		String cacheKey = url;
+		return sendPost(tag, url, cacheKey, params, getDefaultCacheConfig(), onRequestListener);
+	}
+
+	@Override
+	public <T> Request<?> sendPost(Object tag, String url, String cacheKey, RequestParams params, OnRequestListener<T> onRequestListener) {
+		return sendPost(tag, url, cacheKey, params, getDefaultCacheConfig(), onRequestListener);
+	}
+
 	/*
 	 * =======================================================================
 	 * Upload
 	 * =======================================================================
 	 */
-	
+
 	@Override
-	public <T> Request<?> upload(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, Class<?> beanClass, OnRequestListener<T> onRequestListener) {
-		return sendPost(tag, url, cacheKey, params, cacheConfig, beanClass, onRequestListener);
-	}
-	
-	@Override
-	public Request<?> upload(Object tag, String url, String cacheKey, RequestParams params,
-			RequestCacheConfig cacheConfig, OnRequestListener<String> onRequestListener) {
-		return sendPost(tag, url, cacheKey, params, cacheConfig, String.class, onRequestListener);
+	public <T> Request<?> upload(Object tag, String url, String cacheKey, RequestParams params, RequestCacheConfig cacheConfig, OnRequestListener<T> onRequestListener) {
+		return sendPost(tag, url, cacheKey, params, cacheConfig, onRequestListener);
 	}
 
 	@Override
-	public <T> Request<?> upload(Object tag, String url, RequestParams params, Class<?> beanClass,
-			OnRequestListener<T> onRequestListener) {
+	public <T> Request<?> upload(Object tag, String url, RequestParams params, OnRequestListener<T> onRequestListener) {
 		String cacheKey = url;
-		return sendPost(tag, url, cacheKey, params, getNoCacheConfig(), beanClass, onRequestListener);
+		return sendPost(tag, url, cacheKey, params, getNoCacheConfig(), onRequestListener);
 	}
 
 	@Override
-	public Request<?> upload(Object tag, String url, RequestParams params,
-			OnRequestListener<String> onRequestListener) {
-		String cacheKey = url;
-		return sendPost(tag, url, cacheKey, params, getNoCacheConfig(), String.class, onRequestListener);
+	public <T> Request<?> upload(Object tag, String url, String cacheKey, RequestParams params, OnRequestListener<T> onRequestListener) {
+		return sendPost(tag, url, cacheKey, params, getNoCacheConfig(), onRequestListener);
 	}
-
-	@Override
-	public <T> Request<?> upload(Object tag, String url, String cacheKey, RequestParams params,
-			Class<?> beanClass, OnRequestListener<T> onRequestListener) {
-		return sendPost(tag, url, cacheKey, params, getNoCacheConfig(), beanClass, onRequestListener);
-	}
-
-	@Override
-	public Request<?> upload(Object tag, String url, String cacheKey, RequestParams params,
-			OnRequestListener<String> onRequestListener) {
-		return sendPost(tag, url, cacheKey, params, getNoCacheConfig(), String.class, onRequestListener);
-	}
-	
 
 	/*
 	 * =======================================================================
@@ -337,10 +276,8 @@ public class XRequest implements IXReqeust {
 	 * =======================================================================
 	 */
 	@Override
-	public Request<?> download(Object tag, String url, String cacheKey, String downloadPath, String fileName,
-			RequestCacheConfig cacheConfig, OnRequestListener<File> onRequestListener) {
-		DownloadRequest request = new DownloadRequest(cacheConfig, url, cacheKey, downloadPath, fileName,
-				onRequestListener);
+	public Request<?> download(Object tag, String url, String cacheKey, String downloadPath, String fileName, RequestCacheConfig cacheConfig, OnRequestListener<File> onRequestListener) {
+		DownloadRequest request = new DownloadRequest(cacheConfig, url, cacheKey, downloadPath, fileName, onRequestListener);
 		request.setTag(tag);
 
 		addToRequestQueue(request);
@@ -349,8 +286,7 @@ public class XRequest implements IXReqeust {
 	}
 
 	@Override
-	public Request<?> download(Object tag, String url, String downloadPath, String fileName,
-			OnRequestListener<File> onRequestListener) {
+	public Request<?> download(Object tag, String url, String downloadPath, String fileName, OnRequestListener<File> onRequestListener) {
 		return download(tag, url, url, downloadPath, fileName, getNoCacheConfig(), onRequestListener);
 	}
 

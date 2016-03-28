@@ -45,7 +45,8 @@ public abstract class OnRequestListenerAdapter<T> implements OnRequestListener<T
 	}
 	
 	@Override
-	public void onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, T result) {
+	public boolean onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, T result) {
+		return true;
 	}
 
 	@Override

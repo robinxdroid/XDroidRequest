@@ -191,7 +191,7 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	private void post() {
 		String url = "http://apis.baidu.com/heweather/weather/free";
 		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
+		params.putHeaders("apikey", "可以到API Store申请");
 		params.putParams("city", "hefei");
 
 		String cacheKey = url + "post";  //与GET请求的URL一样，为了避免同样的缓存key、这里重新指定缓存key
@@ -239,7 +239,7 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	private void get() {
 		String url = "http://apis.baidu.com/heweather/weather/free";
 		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
+		params.putHeaders("apikey", "可以到API Store申请");
 		params.putParams("city", "hefei");
 
 		String cacheKey = url + "get";  //与POST请求的URL一样，为了避免同样的缓存key、这里重新指定缓存key
@@ -344,10 +344,12 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 			 * @param request 当前请求对象
 			 * @param networkResponse 网络请求结果对象，包含byte数据流与头信息等
 			 * @param result 解析byte数据流构建的对象
+			 * @return 是否允许缓存
 			 */
 			@Override
-			public void onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, String result) {
+			public boolean onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, String result) {
 				CLog.i("GET请求网络数据解析完成");
+				return true;
 			}
 
 			/**
@@ -441,8 +443,9 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 			}
 			
 			@Override
-			public void onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, String result) {
+			public boolean onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, String result) {
 				CLog.i("网络数据解析完成");
+				return true;
 			}
 
 			@Override
@@ -482,8 +485,8 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	private void convertToBean() {
 		String url = "http://apis.baidu.com/apistore/aqiservice/citylist";
 		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
-		XRequest.getInstance().sendPost(mRequestTag, url, params, CityRootBean.class, new OnRequestListener<CityRootBean<CityBean>>() {
+		params.putHeaders("apikey", "可以到API Store申请");
+		XRequest.getInstance().sendPost(mRequestTag, url, params, new OnRequestListener<CityRootBean<CityBean>>() {
 
 			@Override
 			public void onRequestPrepare(Request<?> request) {
@@ -519,7 +522,8 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 			}
 			
 			@Override
-			public void onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, CityRootBean<CityBean> result) {
+			public boolean onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, CityRootBean<CityBean> result) {
+				return true;
 			}
 
 			@Override
@@ -538,9 +542,9 @@ public class RequestExampleActivity extends Activity implements OnClickListener 
 	private void convertToBeanList() {
 		String url = "http://apis.baidu.com/tngou/cook/name";
 		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "ae75f7350ede43701ce8a5ad8a161ff9");
+		params.putHeaders("apikey", "可以到API Store申请");
 		params.putParams("name", "炒饭");
-		XRequest.getInstance().sendPost(mRequestTag, url, params, RecipeRootBean.class, new OnRequestListenerAdapter<RecipeRootBean<RecipeBean>>() {
+		XRequest.getInstance().sendPost(mRequestTag, url, params, new OnRequestListenerAdapter<RecipeRootBean<RecipeBean>>() {
 			
 			@Override
 			public void onRequestUploadProgress(Request<?> request, long transferredBytesSize, long totalSize, int currentFileIndex,

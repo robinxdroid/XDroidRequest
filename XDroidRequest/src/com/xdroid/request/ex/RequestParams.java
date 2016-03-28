@@ -1,6 +1,8 @@
 package com.xdroid.request.ex;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -89,34 +91,39 @@ public class RequestParams extends ConcurrentHashMap<String, Object> {
 	 */
 	public StringBuilder buildParameters() {
 		StringBuilder result = new StringBuilder();
-		for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
-			Object value = entry.getValue();
-			if (value instanceof String || value instanceof Integer) {
-				result.append("&");
-				result.append(entry.getKey());
-				result.append("=");
-				result.append(value instanceof Integer ? (Integer) value + "" : value);
-			} else {
-				CLog.e("Filter value,Type : %s,Value : %s",value.getClass().getName());
+		try {
+			for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
+				Object value = entry.getValue();
+				if (value instanceof String || value instanceof Integer) {
+					result.append("&");
+					result.append(URLEncoder.encode(entry.getKey(), "utf-8"));
+					result.append("=");
+					result.append(URLEncoder.encode(String.valueOf(value), "utf-8"));
+				} else {
+					CLog.e("Filter value,Type : %s,Value : %s", value.getClass().getName());
+				}
 			}
+			return result;
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Encoding not supported: " + "utf-8", e);
 		}
-		return result;
+
 	}
-	
-	public Map<String, String> buildParametersToMap(){
+
+	public Map<String, String> buildParametersToMap() {
 		Map<String, String> result = new ConcurrentHashMap<String, String>();
 		for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
 			Object value = entry.getValue();
 			if (value instanceof String) {
 				result.put(entry.getKey(), (String) value);
-			}else if (value instanceof Integer) {
-				result.put(entry.getKey(), (Integer) value+"");
+			} else if (value instanceof Integer) {
+				result.put(entry.getKey(), (Integer) value + "");
 			}
 		}
 		return result;
 	}
-	
-	public Map<String, File> buildFileParameters(){
+
+	public Map<String, File> buildFileParameters() {
 		Map<String, File> fileParams = new ConcurrentHashMap<String, File>();
 		for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
 			Object value = entry.getValue();
@@ -130,39 +137,44 @@ public class RequestParams extends ConcurrentHashMap<String, Object> {
 	public StringBuilder buildQueryParameters() {
 		StringBuilder result = new StringBuilder();
 		boolean isFirst = true;
-		for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
-			Object value = entry.getValue();
-			if (value instanceof String || value instanceof Integer) {
-				if (!isFirst) {
-					result.append("&");
+		try {
+			for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
+				Object value = entry.getValue();
+				if (value instanceof String || value instanceof Integer) {
+					if (!isFirst) {
+						result.append("&");
+					} else {
+						result.append("?");
+						isFirst = false;
+					}
+					result.append(URLEncoder.encode(entry.getKey(), "utf-8"));
+					result.append("=");
+					result.append(URLEncoder.encode(String.valueOf(value), "utf-8"));
 				} else {
-					result.append("?");
-					isFirst = false;
+					CLog.e("Filter value,Type : %s,Value : %s", value.getClass().getName());
 				}
-				result.append(entry.getKey());
-				result.append("=");
-				result.append(value instanceof Integer ? (Integer) value + "" : value);
-			} else {
-				CLog.e("Filter value,Type : %s,Value : %s",value.getClass().getName());
-			}
 
+			}
+			return result;
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Encoding not supported: " + "utf-8", e);
 		}
-		return result;
+
 	}
-	
+
 	public Map<String, String> buildHeaders() {
 		return mHeaders;
 	}
-	
-	public boolean hasFileInParams(){
-		return buildFileParameters().size()>0;
+
+	public boolean hasFileInParams() {
+		return buildFileParameters().size() > 0;
 	}
-	
-	public boolean hasJsonInParams(){
+
+	public boolean hasJsonInParams() {
 		return !TextUtils.isEmpty(mJsonParams);
 	}
-	
-	public boolean hasNameValuePairInParams(){
+
+	public boolean hasNameValuePairInParams() {
 		return buildParameters().length() > 0;
 	}
 
@@ -173,5 +185,5 @@ public class RequestParams extends ConcurrentHashMap<String, Object> {
 		}
 		return super.toString();
 	}
-	
+
 }

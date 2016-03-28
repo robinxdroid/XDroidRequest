@@ -38,7 +38,7 @@ public interface OnRequestListener<T> {
 	public void onCacheDataLoadFinish(Request<?> request, Map<String, String> headers, T result);
 
 	/** Parse the network response to an object */
-	public void onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse,T result);
+	public boolean onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse,T result);
 	
 	/**
 	 * When the request is completed or the cache data loaded ,call this method

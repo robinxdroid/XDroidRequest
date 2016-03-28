@@ -32,7 +32,7 @@ import com.xdroid.request.utils.CLog;
 public abstract class MultipartRequest<T> extends Request<T>{
 
 	private static final String PROTOCOL_CHARSET = "utf-8";
-	public static final int TIMEOUT_MS = 30000;
+	public static final int TIMEOUT_MS = 2500;
 	private boolean isFixedStreamingMode;
 	
 	private RequestParams mRequestParams;

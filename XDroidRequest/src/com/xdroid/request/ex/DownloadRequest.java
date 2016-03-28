@@ -13,6 +13,8 @@ import com.xdroid.request.response.NetworkResponse;
 import com.xdroid.request.response.Response;
 import com.xdroid.request.utils.CLog;
 
+import android.text.TextUtils;
+
 /**
  * Download request
  * @author Robin
@@ -56,10 +58,14 @@ public class DownloadRequest extends MultipartRequest<File> {
 				directory.mkdir();
 			}
             
-		    FileOutputStream fileOuputStream = new FileOutputStream(mDownloadPath+File.separator+mFileName); 
+            String path = mDownloadPath;
+            if (!TextUtils.isEmpty(mFileName)) {
+            	   path = mDownloadPath+File.separator+mFileName;
+			}
+		    FileOutputStream fileOuputStream = new FileOutputStream(path); 
 		    fileOuputStream.write(data);
 		    fileOuputStream.close();
-		    downloadFile = new File(mDownloadPath+File.separator+mFileName);
+		    downloadFile = new File(path);
         } catch (FileNotFoundException e) {
 			e.printStackTrace();
 			CLog.e("Download directory %s is not exsit",mDownloadPath);

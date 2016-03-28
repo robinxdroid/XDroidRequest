@@ -1,5 +1,6 @@
 package com.xdroid.request.ex;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
@@ -11,6 +12,7 @@ import com.xdroid.request.interfaces.OnRequestListener;
 import com.xdroid.request.response.NetworkResponse;
 import com.xdroid.request.response.Response;
 import com.xdroid.request.utils.CLog;
+import com.xdroid.request.utils.GenericsUtils;
 /**
  * Parse the result by "GSON"
  * 
@@ -21,25 +23,26 @@ import com.xdroid.request.utils.CLog;
  */
 public class MultipartGsonRequest<T> extends MultipartRequest<T> {
 
-	private Class<?> mBeanClass;
-
-	public MultipartGsonRequest(Class<?> cls) {
+	private Type mBeanType;
+	
+	public MultipartGsonRequest() {
 		super();
-		this.mBeanClass = cls;
 	}
 
-	public MultipartGsonRequest(RequestCacheConfig cacheConfig, String url, String cacheKey, Class<?> cls,
+	public MultipartGsonRequest(RequestCacheConfig cacheConfig, String url, String cacheKey,
 			OnRequestListener<T> onRequestListener) {
 		super(cacheConfig, url, cacheKey, onRequestListener);
-		this.mBeanClass = cls;
+		mBeanType = GenericsUtils.getBeanType(onRequestListener);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Response<T> parseNetworkResponse(NetworkResponse response) {
 		String result = new String(response.data);
+		
+		CLog.d("[Original String Data]:%s",result);
 
-		if (mBeanClass.getName().equals(String.class.getName())) {
+		if (mBeanType.equals(String.class)) {
 			T parseResult = (T) result;
 			CLog.d("parse network response complete");
 			super.onParseNetworkResponse(response, parseResult);
@@ -48,14 +51,14 @@ public class MultipartGsonRequest<T> extends MultipartRequest<T> {
 		}
 
 		if (result.startsWith("[") && result.endsWith("]")) {
-			T parseResult = (T) fromJsonList(result, mBeanClass);
+			T parseResult = (T) fromJsonList(result, mBeanType);
 			CLog.d("parse network response complete");
 			super.onParseNetworkResponse(response, parseResult);
 
 			return Response.success(parseResult, response.headers);
 		}
 		if (result.startsWith("{") && result.endsWith("}")) {
-			T parseResult = (T) fromJsonObject(result, mBeanClass);
+			T parseResult = (T) fromJsonObject(result, mBeanType);
 			CLog.d("parse network response complete");
 			super.onParseNetworkResponse(response, parseResult);
 
@@ -63,19 +66,20 @@ public class MultipartGsonRequest<T> extends MultipartRequest<T> {
 		}
 		return null;
 	}
-
-	public <X> X fromJsonObject(String json, Class<X> cls) {
+	
+	public <X> X fromJsonObject(String json, Type cls) {
 		Gson gson = new Gson();
 		X bean = gson.fromJson(json, cls);
 		return bean;
 	}
 
-	public <X> ArrayList<X> fromJsonList(String json, Class<X> cls) {
+	@SuppressWarnings("unchecked")
+	public <X> ArrayList<X> fromJsonList(String json, Type cls) {
 		Gson gson = new Gson();
 		ArrayList<X> mList = new ArrayList<X>();
 		JsonArray array = new JsonParser().parse(json).getAsJsonArray();
 		for (final JsonElement elem : array) {
-			mList.add(gson.fromJson(elem, cls));
+			mList.add((X) gson.fromJson(elem, cls));
 		}
 		return mList;
 	}
