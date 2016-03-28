@@ -53,7 +53,9 @@
 
 ### Usage ###
 
-**1.初始化，应用启动的时候进行，主要初始化缓存的路径等信息**
+**1.初始化，应用启动的时候进行，主要初始化缓存的路径等信息.有同学认为使用框架在Application中初始化是个
+不太好的实现，会有种麻烦多余的感觉，此框架设计之初并不需要这样的操作，因为框架内部设计到网络判定此类功能
+需要传入Context，在“每发起一个请求传入Context”与“初始化时传入Context”两种方式中，选择了后者**
 
 ```java
 XRequest.initXRequest(getApplicationContext());
@@ -77,153 +79,14 @@ XRequest.initXRequest(getApplicationContext());
 		});
 		 
 ```
-② POST请求
-```java
-String url = "http://apis.baidu.com/heweather/weather/free";
-RequestParams params = new RequestParams();
-params.putHeaders("apikey", "可以到apistore申请");
-params.putParams("city", "hefei");
 
-XRequest.getInstance().sendPost(mRequestTag, url,  params, new OnRequestListenerAdapter<String>() {
-			
-	@Override
-	public void onRequestFailed(Request<?> request, HttpException httpException) {
-		super.onRequestFailed(request, httpException);
-		switch (httpException.getHttpErrorCode()) {
-		case HttpError.ERROR_NOT_NETWORK:
-			Toast.makeText(context, "网络未连接，请检查", Toast.LENGTH_SHORT).show();
-			break;
-		}
-	}
+请求的发起流程就这两步，真正的项目中可能会有许多其他的设置，请见下方
 
-	@Override
-	public void onRequestRetry(Request<?> request, int currentRetryCount, HttpException previousError) {
-		Toast.makeText(context, "获取信息失败，系统已经为您重试" + currentRetryCount+"次", Toast.LENGTH_SHORT).show();
-				
-		CLog.i("POST请求结果失败，正在重试,当前重试次数：" + currentRetryCount);
-	}
-			
-	@Override
-	public void onRequestDownloadProgress(Request<?> request, long transferredBytesSize, long totalSize) {
-		CLog.i("onRequestDownloadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
-	}
-			
-	@Override
-	public void onRequestUploadProgress(Request<?> request, long transferredBytesSize, long totalSize, int currentFileIndex,
-			File currentFile) {
-		CLog.i("onRequestUploadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
-	}
-
-	@Override
-	public void onDone(Request<?> request, Map<String, String> headers, String result, DataType dataType) {
-		super.onDone(request, headers, result, dataType);
-	}
-});
-```
-
-③ 发送JSON字符串参数
-```java
-RequestParams params = new RequestParams();
-params.putParams(
-		"{\"uid\":863548,\"stickys\":[{\"id\":29058,\"iid\":0,\"content\":\"内容\",\"color\":\"green\",\"createtime\":\"2015-04-16 16:26:17\",\"updatetime\":\"2015-04-16 16:26:17\"}]}");
-XRequest.getInstance().sendPost(mRequestTag, url, params, new OnRequestListenerAdapter<String>() {
-	@Override
-	public void onDone(Request<?> request, Map<String, String> headers, String result, DataType dataType) {
-		super.onDone(request, headers, result, dataType);
-	}
-});
-```
-④上传文件
-```java
-String url = "http://192.168.1.150/upload_multi.php";
-RequestParams params = new RequestParams();
-params.put("file[0]", new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "app-debug.apk"));
-params.put("file[1]", new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "photoview.apk"));
-params.putParams("file_name", "上传的文件名称");
-
-XRequest.getInstance().upload(mRequestTag, url,  params, new OnRequestListenerAdapter<String>() {
-
-	@Override
-	public void onRequestPrepare(Request<?> request) {
-		Toast.makeText(context, "请求准备", Toast.LENGTH_SHORT).show();
-		CLog.i("请求准备");
-	}
-
-	@Override
-	public void onRequestFailed(Request<?> request,HttpException httpException) {
-		Toast.makeText(context, "请求结果失败", Toast.LENGTH_SHORT).show();
-		CLog.i("请求结果失败");
-	}
-
-	@Override
-	public void onRequestRetry(Request<?> request, int currentRetryCount, HttpException previousError) {
-		Toast.makeText(context, "获取信息失败，系统已经为您重试" + currentRetryCount+"次", Toast.LENGTH_SHORT).show();
-		
-		CLog.i("请求结果失败，正在重试,当前重试次数：" + currentRetryCount);
-	}
-			
-	@Override
-	public void onRequestUploadProgress(Request<?> request, long transferredBytesSize, long totalSize, int currentFileIndex,
-			File currentFile) {
-		CLog.i("正在上传第%s个文件,当前进度：%d , 总大小 : %d" ,currentFileIndex,transferredBytesSize,totalSize);
-		
-		mUploadProgressBar.setMax((int) totalSize);
-		mUploadProgressBar.setProgress((int) transferredBytesSize);
-	}
-	@Override
-	public void onDone(Request<?> request, Map<String, String> headers, String response, DataType dataType) {
-		Toast.makeText(context, "请求完成", Toast.LENGTH_SHORT).show();
-	}
-
-
-});
-```
-测试了上传百兆以上文件无压力，如果你想测试多文件上传，下面的PHP多文件上传代码供参考。要注意的是PHP默认上传2M以内文件，需要自己改下
-配置文件，网上很多，搜索即可
-```java
-<?php
- foreach($_FILES['file']['error'] as $k=>$v)
- {
-    $uploadfile = './upload/'. basename($_FILES['file']['name'][$k]);
-    if (move_uploaded_file($_FILES['file']['tmp_name'][$k], $uploadfile)) 
-    {
-        echo "File : ", $_FILES['file']['name'][$k] ," is valid, and was successfully uploaded.\n";
-    }
-
-    else 
-    {
-        echo "Possible file : ", $_FILES['file']['name'][$k], " upload attack!\n";
-    }   
-
- }
-
- echo "成功接收附加字段:". $_POST['file_name'];
-
-?>
-```
-⑤下载文件
-```java
-String url = "http://192.168.1.150/upload/xiaokaxiu.apk";
-String downloadPath = "/sdcard/xrequest/download";
-String fileName = "test.apk";
-XRequest.getInstance().download(mRequestTag, url, downloadPath,fileName, new OnRequestListenerAdapter<File>() {
-	@Override
-	public void onRequestDownloadProgress(Request<?> request, long transferredBytesSize, long totalSize) {
-		CLog.i("正在下载， 当前进度：%d , 总大小 : %d" ,transferredBytesSize,totalSize);
-		mDownloadProgressBar.setMax((int) totalSize);
-		mDownloadProgressBar.setProgress((int) transferredBytesSize);
-	}
-	@Override
-	public void onDone(Request<?> request, Map<String, String> headers, File result, DataType dataType) {
-		CLog.i("下载完成 : %s",result != null?result.toString():"获取File为空");
-	}
-});
-```
-
-⑥关于回调
-
- 请求回调OnRequestListener，回调函数很多，根据自己需求选择性复写即可，传入OnRequestListener默认实现类OnRequestListenerAdapter即可
-```java
+② 请求回调：
+  回调Callback:OnRequestListener,此回调包含了很多监听，有些回调可能你不要重写，那么只需传入OnRequestListenerAdapter
+  选择性复写需要的回调函数即可，这里是OnRequestListener的每个回调函数的注释：
+  
+  ```java
 XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequestListener<String>() {
 
 			/**
@@ -347,58 +210,110 @@ XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequest
 		});
 ```
 
- 下面是选择性复写回调函数
- ```java
- String url = "http://apis.baidu.com/heweather/weather/free";
-		RequestParams params = new RequestParams();
-		params.putHeaders("apikey", "可以到apistore申请");
-		params.putParams("city", "hefei");
+③POST请求
+```java
+String url = "http://apis.baidu.com/heweather/weather/free";
+RequestParams params = new RequestParams();
+params.putHeaders("apikey", "可以到apistore申请");
+params.putParams("city", "hefei");
 
-		String cacheKey = url + "post";  //与GET请求的URL一样，为了避免同样的缓存key、这里重新指定缓存key
-		XRequest.getInstance().sendPost(mRequestTag, url, cacheKey, params, new OnRequestListenerAdapter<String>() {
-			
-			@Override
-			public void onRequestFailed(Request<?> request, HttpException httpException) {
-				super.onRequestFailed(request, httpException);
-				switch (httpException.getHttpErrorCode()) {
-				case HttpError.ERROR_NOT_NETWORK:
-					Toast.makeText(context, "网络未连接，请检查", Toast.LENGTH_SHORT).show();
-					break;
-				}
-			}
+XRequest.getInstance().sendPost(mRequestTag, url,  params, new OnRequestListenerAdapter<String>() {
 
-			@Override
-			public void onRequestRetry(Request<?> request, int currentRetryCount, HttpException previousError) {
-				Toast.makeText(context, "获取信息失败，系统已经为您重试" + currentRetryCount+"次", Toast.LENGTH_SHORT).show();
-				
-				CLog.i("POST请求结果失败，正在重试,当前重试次数：" + currentRetryCount);
-			}
-			
-			@Override
-			public void onRequestDownloadProgress(Request<?> request, long transferredBytesSize, long totalSize) {
-				CLog.i("onRequestDownloadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
-			}
-			
-			@Override
-			public void onRequestUploadProgress(Request<?> request, long transferredBytesSize, long totalSize, int currentFileIndex,
-					File currentFile) {
-				CLog.i("onRequestUploadProgress current：%d , total : %d" ,transferredBytesSize,totalSize);
-			}
-
-			@Override
-			public void onDone(Request<?> request, Map<String, String> headers, String result, DataType dataType) {
-				super.onDone(request, headers, result, dataType);
-			}
-		});
-
+	@Override
+	public void onDone(Request<?> request, Map<String, String> headers, String result, DataType dataType) {
+		super.onDone(request, headers, result, dataType);
 	}
+});
 ```
+
+④ 发送JSON字符串参数
+```java
+RequestParams params = new RequestParams();
+params.putParams(
+		"{\"uid\":863548,\"stickys\":[{\"id\":29058,\"iid\":0,\"content\":\"内容\",\"color\":\"green\",\"createtime\":\"2015-04-16 16:26:17\",\"updatetime\":\"2015-04-16 16:26:17\"}]}");
+XRequest.getInstance().sendPost(mRequestTag, url, params, new OnRequestListenerAdapter<String>() {
+	@Override
+	public void onDone(Request<?> request, Map<String, String> headers, String result, DataType dataType) {
+		super.onDone(request, headers, result, dataType);
+	}
+});
+```
+⑤上传文件
+```java
+String url = "http://192.168.1.150/upload_multi.php";
+RequestParams params = new RequestParams();
+params.put("file[0]", new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "app-debug.apk"));
+params.put("file[1]", new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "photoview.apk"));
+params.putParams("file_name", "上传的文件名称");
+
+XRequest.getInstance().upload(mRequestTag, url,  params, new OnRequestListenerAdapter<String>() {
+
+	
+			
+	@Override
+	public void onRequestUploadProgress(Request<?> request, long transferredBytesSize, long totalSize, int currentFileIndex,
+			File currentFile) {
+		CLog.i("正在上传第%s个文件,当前进度：%d , 总大小 : %d" ,currentFileIndex,transferredBytesSize,totalSize);
+		
+		mUploadProgressBar.setMax((int) totalSize);
+		mUploadProgressBar.setProgress((int) transferredBytesSize);
+	}
+	@Override
+	public void onDone(Request<?> request, Map<String, String> headers, String response, DataType dataType) {
+		Toast.makeText(context, "请求完成", Toast.LENGTH_SHORT).show();
+	}
+
+
+});
+```
+测试了上传百兆以上文件无压力，如果你想测试多文件上传，下面的PHP多文件上传代码供参考。要注意的是PHP默认上传2M以内文件，需要自己改下
+配置文件，网上很多，搜索即可
+```java
+<?php
+ foreach($_FILES['file']['error'] as $k=>$v)
+ {
+    $uploadfile = './upload/'. basename($_FILES['file']['name'][$k]);
+    if (move_uploaded_file($_FILES['file']['tmp_name'][$k], $uploadfile)) 
+    {
+        echo "File : ", $_FILES['file']['name'][$k] ," is valid, and was successfully uploaded.\n";
+    }
+
+    else 
+    {
+        echo "Possible file : ", $_FILES['file']['name'][$k], " upload attack!\n";
+    }   
+
+ }
+
+ echo "成功接收附加字段:". $_POST['file_name'];
+
+?>
+```
+⑥下载文件
+```java
+String url = "http://192.168.1.150/upload/xiaokaxiu.apk";
+String downloadPath = "/sdcard/xrequest/download";
+String fileName = "test.apk";
+XRequest.getInstance().download(mRequestTag, url, downloadPath,fileName, new OnRequestListenerAdapter<File>() {
+	@Override
+	public void onRequestDownloadProgress(Request<?> request, long transferredBytesSize, long totalSize) {
+		CLog.i("正在下载， 当前进度：%d , 总大小 : %d" ,transferredBytesSize,totalSize);
+		mDownloadProgressBar.setMax((int) totalSize);
+		mDownloadProgressBar.setProgress((int) transferredBytesSize);
+	}
+	@Override
+	public void onDone(Request<?> request, Map<String, String> headers, File result, DataType dataType) {
+		CLog.i("下载完成 : %s",result != null?result.toString():"获取File为空");
+	}
+});
+```
+
 ⑦自动解析
 ```java
 String url = "http://apis.baidu.com/apistore/aqiservice/citylist";
 RequestParams params = new RequestParams();
 params.putHeaders("apikey", "可以到apistore申请");
-XRequest.getInstance().sendPost(mRequestTag, url, params, CityRootBean.class, new OnRequestListenerAdapter<CityRootBean<CityBean>>() {
+XRequest.getInstance().sendPost(mRequestTag, url, params, new OnRequestListenerAdapter<CityRootBean<CityBean>>() {
 
 	@Override
 	public void onDone(Request<?> request, Map<String, String> headers, CityRootBean<CityBean> result,
