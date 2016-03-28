@@ -188,10 +188,12 @@ XRequest.getInstance().sendGet(mRequestTag, url, cacheKey, params, new OnRequest
 			 * @param request 当前请求对象
 			 * @param networkResponse 网络请求结果对象，包含byte数据流与头信息等
 			 * @param result 解析byte数据流构建的对象
+			 * @return 是否允许缓存，“true”允许缓存 “fale”反之，默认为true，请求解析完成后，可以根据情况自己指定缓存条件
 			 */
 			@Override
-			public void onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, String result) {
+			public boolean onParseNetworkResponse(Request<?> request, NetworkResponse networkResponse, String result) {
 				CLog.i("GET请求网络数据解析完成");
+			        return true
 			}
 
 			/**
