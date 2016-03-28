@@ -366,6 +366,7 @@ Clog.closeLog();
 ```
 
 **11.请求示例**：
+
 (1)POST请求
 ```java
 String url = "http://apis.baidu.com/heweather/weather/free";
