@@ -9,7 +9,7 @@ import com.xdroid.request.config.RequestCacheConfig;
 import com.xdroid.request.ex.DownloadRequest;
 import com.xdroid.request.ex.MultipartGsonRequest;
 import com.xdroid.request.ex.RequestParams;
-import com.xdroid.request.interfaces.IXReqeust;
+import com.xdroid.request.interfaces.IXRequest;
 import com.xdroid.request.interfaces.OnRequestListener;
 import com.xdroid.request.queue.RequestQueue;
 import com.xdroid.request.utils.AppUtils;
@@ -23,7 +23,7 @@ import android.content.Context;
  * @since 2015-08-12 17:43:03
  *
  */
-public class XRequest implements IXReqeust {
+public class XRequest implements IXRequest {
 
 	private static volatile XRequest INSTANCE = null;
 

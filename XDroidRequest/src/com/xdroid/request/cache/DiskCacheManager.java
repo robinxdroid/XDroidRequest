@@ -2,6 +2,7 @@ package com.xdroid.request.cache;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -70,6 +71,9 @@ public class DiskCacheManager <ValueType>{
          try {
 			mDiskLruCache=DiskLruCache.open(cacheDir, CacheConfig.DISK_CACHE_APP_VERSION, DEFAULT_VALUE_COUNT, CacheConfig.DISK_CACHE_MAX_SIZE);
 		} catch (IOException e) {
+			if (e instanceof FileNotFoundException) {
+				throw new RuntimeException("Maybe you forgot to add storage permissions to the AndroidMenifest file.");
+			}
 			e.printStackTrace();
 		}
 	}

@@ -7,12 +7,13 @@ import com.xdroid.request.interfaces.IRequestCacheManager;
 
 /**
  * Request cache manager
+ * 
  * @author Robin
  * @since 2015-12-30 17:27:33
  *
  */
-public class RequestCacheManager implements IRequestCacheManager{
-	
+public class RequestCacheManager implements IRequestCacheManager {
+
 	private static volatile RequestCacheManager INSTANCE = null;
 
 	public static RequestCacheManager getInstance() {
@@ -25,10 +26,9 @@ public class RequestCacheManager implements IRequestCacheManager{
 		}
 		return INSTANCE;
 	}
-	
 
-	//----------------------------------------Disk-------------------------------------------
-	
+	// ----------------------------------------Disk-------------------------------------------
+
 	@Override
 	public File getDiskCacheDirectory() {
 		@SuppressWarnings("unchecked")
@@ -87,24 +87,16 @@ public class RequestCacheManager implements IRequestCacheManager{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T  getDataFromDiskCache(String originalKey) {
+	public <T> T getDataFromDiskCache(String originalKey) {
 		DiskCacheManager<CacheData<Entry<?>>> diskCacheManager = (DiskCacheManager<CacheData<Entry<?>>>) DiskCacheManager.getInstance();
-		return (T) diskCacheManager.getDataFromDiskCache(originalKey);
+		CacheData<Entry<?>> cacheData = diskCacheManager.getDataFromDiskCache(originalKey);
+		if (cacheData != null && cacheData.getEntry() != null && cacheData.getEntry().result != null) {
+			return (T) cacheData.getEntry().result;
+		}
+		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T  getDataFromDiskCache(Request<?> request) {
-		return (T) request.getDiskCacheManager().getDataFromDiskCache(request.getCacheKey());
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getDataFromDiskCache(Request<?> request, String originalKey) {
-		return (T) request.getDiskCacheManager().getDataFromDiskCache(originalKey);
-	}
-	
-	//----------------------------------------Memory-------------------------------------------
+	// ----------------------------------------Memory-------------------------------------------
 
 	@Override
 	public void deleteOneMemoryCacheData(String key) {
@@ -120,7 +112,7 @@ public class RequestCacheManager implements IRequestCacheManager{
 
 	@Override
 	public void deleteOneMemoryCacheData(Request<?> request, String key) {
-		 request.getCacheManager().deleteOneMemoryCacheData(key);
+		request.getCacheManager().deleteOneMemoryCacheData(key);
 	}
 
 	@Override
@@ -134,19 +126,11 @@ public class RequestCacheManager implements IRequestCacheManager{
 	@Override
 	public <T> T getDataFromMemoryCache(String key) {
 		MemoryCacheManager<String, CacheData<Entry<?>>> memoryCacheManager = (MemoryCacheManager<String, CacheData<Entry<?>>>) MemoryCacheManager.getInstance();
-		return (T) memoryCacheManager.getDataFromMemoryCache(key);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getDataFromMemoryCache(Request<?> request) {
-		return (T) request.getCacheManager().getDataFromMemoryCache(request.getCacheKey());
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getDataFromMemoryCache(Request<?> request, String key) {
-		return (T) request.getCacheManager().getDataFromMemoryCache(key);
+		CacheData<Entry<?>> cacheData = memoryCacheManager.getDataFromMemoryCache(key);
+		if (cacheData != null && cacheData.getEntry() != null && cacheData.getEntry().result != null) {
+			return (T) cacheData.getEntry().result;
+		}
+		return null;
 	}
 
 }

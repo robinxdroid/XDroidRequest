@@ -94,6 +94,9 @@ public class RequestParams extends ConcurrentHashMap<String, Object> {
 		try {
 			for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
 				Object value = entry.getValue();
+				if (value == null) {
+					continue;
+				}
 				if (value instanceof String || value instanceof Integer) {
 					result.append("&");
 					result.append(URLEncoder.encode(entry.getKey(), "utf-8"));
@@ -114,6 +117,9 @@ public class RequestParams extends ConcurrentHashMap<String, Object> {
 		Map<String, String> result = new ConcurrentHashMap<String, String>();
 		for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
 			Object value = entry.getValue();
+			if (value == null) {
+				continue;
+			}
 			if (value instanceof String) {
 				result.put(entry.getKey(), (String) value);
 			} else if (value instanceof Integer) {
@@ -127,6 +133,9 @@ public class RequestParams extends ConcurrentHashMap<String, Object> {
 		Map<String, File> fileParams = new ConcurrentHashMap<String, File>();
 		for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
 			Object value = entry.getValue();
+			if (value == null) {
+				continue;
+			}
 			if (value instanceof File) {
 				fileParams.put(entry.getKey(), (File) value);
 			}
@@ -140,6 +149,9 @@ public class RequestParams extends ConcurrentHashMap<String, Object> {
 		try {
 			for (ConcurrentHashMap.Entry<String, Object> entry : this.entrySet()) {
 				Object value = entry.getValue();
+				if (value == null) {
+					continue;
+				}
 				if (value instanceof String || value instanceof Integer) {
 					if (!isFirst) {
 						result.append("&");
