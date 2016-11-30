@@ -1,6 +1,8 @@
 ## XDroidRequest ##
 
-**XDroidRequest** 是一款网络请求框架,它的功能也许会适合你。这是本项目的第三版了，前两版由于扩展性问题一直不满意,思考来
+**XDroidRequest** 
+[DEPRECATED]最新代码见[https://github.com/robinxdroid/HttpRequest](https://github.com/robinxdroid/HttpRequest)
+是一款网络请求框架,它的功能也许会适合你。这是本项目的第三版了，前两版由于扩展性问题一直不满意,思考来
 思考去还是觉得Google的Volley的扩展性最强,于是借鉴了Volley的责任链模式,所以有了这个第三版.
 
 ### Provide ###
